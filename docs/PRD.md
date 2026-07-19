@@ -29,11 +29,12 @@ The game has eight stages:
 1. Driver Controls: dashboard overview with hotspot lessons and closeup photos, then
    a guided startup checklist.
 2. City Driving: road discipline, red light, stop sign, and destination driving.
-3. Off-Road & Gears: transfer-case and transmission choices for terrain gates.
+3. Off-Road & Gears: transfer-case and transmission choices for terrain gates,
+   including stopped/neutral transfer-case range changes.
 4. Technical Off-Road: side-view slope, descent, traction, rollover, and water hazards.
 5. Trailer Parking: articulated M149-style trailer reversing and parking.
-6. Pre/Post Checks: tire pressure/condition, oil, fluids, belts/hoses/wiring, leaks,
-   tires, and hubs.
+6. Pre/Post Checks: tire pressure/condition, oil, fluids, belts/hoses/wiring, air
+   restriction, leaks, tires, and hubs.
 7. Gauge Scan: oil pressure, temperature, fuel, speed/odometer, and voltmeter
    multiple-choice quiz.
 8. Humvee Trivia: high-level history and specification quiz based on the English and

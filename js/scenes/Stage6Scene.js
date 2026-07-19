@@ -9,6 +9,7 @@ const CHECKS = [
   { key: "oil", title: "s6_oil_title", body: "s6_oil_body", image: "inspection_engine" },
   { key: "fluids", title: "s6_fluids_title", body: "s6_fluids_body", image: "inspection_fluids" },
   { key: "belts", title: "s6_belts_title", body: "s6_belts_body", image: "inspection_engine" },
+  { key: "air", title: "s6_air_title", body: "s6_air_body", image: "inspection_engine" },
   { key: "post_leaks", title: "s6_post_leaks_title", body: "s6_post_leaks_body", image: "inspection_engine" },
   { key: "post_tires", title: "s6_post_tires_title", body: "s6_post_tires_body", image: "inspection_tire" },
 ];
@@ -68,7 +69,7 @@ export default class Stage6Scene extends Phaser.Scene {
     const gapX = 34;
     const gapY = 28;
     const x = GAME_WIDTH / 2 - (w + gapX) + (i % cols) * (w + gapX);
-    const y = 245 + Math.floor(i / cols) * (h + gapY);
+    const y = 232 + Math.floor(i / cols) * (h + gapY);
     const cont = this.add.container(x, y);
     const bg = this.add
       .rectangle(0, 0, w, h, COLORS.panel, 0.95)

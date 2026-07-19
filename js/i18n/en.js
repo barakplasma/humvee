@@ -91,10 +91,10 @@ export const en = {
     "Power-assisted steering. The Humvee is wide — give obstacles extra clearance.",
   ctrl_trans_name: "Transmission Selector",
   ctrl_trans_desc:
-    "4-speed automatic: P (park), R (reverse), N (neutral), OD (overdrive, road cruising), D (drive), 2 and 1 (low gears for grades and control).",
+    "4-speed automatic: P (park), R (reverse), N (neutral), OD (overdrive, road cruising), D (drive), 2 and 1 (low gears for grades and control). For this HMMWV start-up drill, set N before starting.",
   ctrl_transfer_name: "Transfer Case",
   ctrl_transfer_desc:
-    "Range lever: H (high, normal), HL (high + locked differential for slippery ground), N (neutral), L (low range for steep or technical terrain).",
+    "Range lever: H (normal and preferred when traction is good), HL (high lock for off-highway hills or continuous wheel slip), N (towing/disabled), L (low range for steep hills, downgrades, or mired recovery). Shift ranges only as a stopped/neutral procedure.",
   ctrl_lights_name: "Light Switch",
   ctrl_lights_desc:
     "Tactical light panel: service drive (normal), blackout drive, and blackout marker lights for low-visibility operations.",
@@ -113,6 +113,7 @@ export const en = {
   startup_intro: "Complete the steps in order.",
   startup_step_pbrake: "Set the parking brake",
   startup_step_park: "Put the transmission in P (Park)",
+  startup_step_neutral: "Put the transmission in N (Neutral)",
   startup_step_run: "Turn the ignition to RUN",
   startup_step_wait: "Wait for the WAIT-TO-START light to go out",
   startup_step_start: "Turn the ignition to START",
@@ -144,15 +145,16 @@ export const en = {
   // ---- Stage 3 off-road & gears ----
   s3_obj: "Pick the correct gears for each section of trail, then drive through it.",
   s3_prompt_reverse: "Back out of the staging area. Which transmission gear?",
-  s3_prompt_cruise: "Flat, firm trail ahead. Set an efficient cruising setup.",
-  s3_prompt_slippery: "Loose, slippery mud. You need locked drive to both axles.",
-  s3_prompt_climb: "Short, steep climb. You need maximum low-range torque.",
+  s3_prompt_cruise: "Flat, firm trail ahead. Use H whenever possible when little or no slip exists.",
+  s3_prompt_slippery: "Loose, slippery mud. Use HL when continuous wheel slip means you need more traction.",
+  s3_prompt_climb: "Short, steep climb. Use low range only when high ranges do not provide enough power.",
   s3_need_trans: "Set the transmission.",
   s3_need_transfer: "Set the transfer case.",
   s3_wrong_reverse: "To move backward you need R (Reverse).",
-  s3_wrong_cruise: "On firm flat ground use H range with D or OD — save the engine.",
-  s3_wrong_slippery: "Slippery ground needs HL (high, differential locked) for grip.",
-  s3_wrong_climb: "A steep climb needs L (low range) with gear 1 for torque.",
+  s3_wrong_cruise: "On firm ground use H range with D or OD. H is the normal range when traction is good.",
+  s3_wrong_slippery: "Continuous wheel slip calls for HL, the high-lock range for added traction.",
+  s3_wrong_climb: "If high ranges cannot handle the hill, use L with gear 1 for low-speed control and torque.",
+  s3_range_shift_stop: "Stop, shift the transmission to N, then change transfer-case range.",
   s3_correct: "Correct — drive on.",
   s3_section_done: "Section cleared!",
   s3_complete: "Trail complete. You matched gears to terrain.",
@@ -161,9 +163,9 @@ export const en = {
   s4_obj: "Cross the technical course. Read the terrain and use the right technique.",
   s4_pitch: "PITCH",
   s4_roll: "ROLL",
-  s4_hint_climb: "Steep climb — low range, steady throttle, keep momentum.",
+  s4_hint_climb: "Steep climb — the HMMWV performance limit is a 60% grade. Use low range, steady throttle, and momentum.",
   s4_hint_descend: "Descent — low gear, let engine braking hold you back. Ease off the gas.",
-  s4_hint_sideslope: "Side-slope — keep speed low and steady. Do not turn uphill sharply.",
+  s4_hint_sideslope: "Side-slope — the listed side-slope limit is 40%. Keep speed low and steady; do not turn uphill sharply.",
   s4_hint_3wheel: "A wheel is off the ground! Keep gentle, steady throttle to crawl across.",
   s4_hint_ford: "Water crossing — enter slowly, keep a steady bow wave, do not stop.",
   s4_warn_rollover: "Rollover risk! Reduce the side angle.",
@@ -192,13 +194,16 @@ export const en = {
     "Before driving, check all tires for obvious low pressure, cuts, exposed cord, missing valve caps, and loose or missing lug nuts. Use the correct pressure from the vehicle data plate or unit SOP.",
   s6_oil_title: "Engine Oil",
   s6_oil_body:
-    "With the vehicle level and engine off, pull the dipstick, wipe it, reinsert, then read the level. Oil should be in range and not milky, gritty, or burnt-smelling.",
+    "With the vehicle level and engine off, pull the dipstick, wipe it, reinsert, then read the level. Oil should be in range and not milky, gritty, or burnt-smelling. After start, oil pressure below 6 psi at idle is a no-go condition.",
   s6_fluids_title: "Fluid Levels",
   s6_fluids_body:
     "Check coolant, brake fluid, power steering fluid, and other visible reservoirs according to the operator checklist. Do not open a hot cooling system.",
   s6_belts_title: "Belts, Hoses & Wiring",
   s6_belts_body:
     "Look for cracked belts, loose clamps, worn hoses, damaged wiring, or anything rubbing near moving parts. Small issues become breakdowns off-road.",
+  s6_air_title: "Air Restriction",
+  s6_air_body:
+    "Dust and sand can choke the intake. During PMCS, check the air restriction gauge or indicator; red means the vehicle is not ready until corrected.",
   s6_post_leaks_title: "Post-Drive Leaks",
   s6_post_leaks_body:
     "After driving, look under the engine, transmission, transfer case, axles, and hubs for fresh leaks. New drips after a hard run matter.",
@@ -213,12 +218,12 @@ export const en = {
   s7_wrong: "Not quite. Try that gauge again.",
   s7_oil_title: "Oil Pressure",
   s7_oil_body:
-    "Oil pressure confirms the engine is being lubricated. A sudden drop, flicker, or reading outside the normal range means stop safely and investigate.",
+    "Oil pressure confirms the engine is being lubricated. A sudden drop, flicker, or less than 6 psi at idle means stop safely and investigate.",
   s7_oil_question: "The oil pressure drops suddenly while driving. What should you do?",
   s7_oil_choice_stop: "Stop safely and investigate",
   s7_temp_title: "Engine Temperature",
   s7_temp_body:
-    "Temperature shows cooling-system health. Rising temperature under load means reduce strain, check airflow, coolant, fan belts, and leaks.",
+    "Temperature shows cooling-system health. Rising temperature under load means reduce strain, check airflow, coolant, fan belts, and leaks. A reading above 230°F / 110°C is a no-go condition.",
   s7_temp_question: "The temperature gauge climbs under load. What is the best first response?",
   s7_temp_choice_reduce: "Reduce strain and check cooling",
   s7_fuel_title: "Fuel Level",
@@ -233,7 +238,7 @@ export const en = {
   s7_speed_choice_adjust: "Match speed to limits and gear range",
   s7_volt_title: "Voltmeter",
   s7_volt_body:
-    "Voltage shows charging-system health. Low voltage can mean battery or alternator trouble; unusually high voltage can damage equipment.",
+    "Voltage shows charging-system health. A needle staying in the yellow or red range can mean battery, alternator, or regulator trouble.",
   s7_volt_question: "The voltmeter shows an abnormal charge reading. What does that suggest?",
   s7_volt_choice_check: "Check the charging system",
   s7_choice_ignore: "Ignore it if the engine runs",

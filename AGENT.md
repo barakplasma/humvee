@@ -62,7 +62,7 @@ Each stage ends by starting `StageCompleteScene` with `{ stage, score, nextScene
    `dashboard_panel`). 12 tappable hotspots (from `js/data/controls.js`) teach each
    control; positions are **tuned to the shipped cockpit photo's cover-fit layout**.
    After all 12 are reviewed, dismissing the final card starts a guided **start-up
-   sequence** checklist (parking brake → P → RUN → wait-to-start glow plugs → START
+   sequence** checklist (parking brake → N → RUN → wait-to-start glow plugs → START
    → release brake → D).
 2. **City Driving** (`Stage2Scene`) — top-down. Obey a traffic light + stop sign,
    stay on the road (L-shaped course), reach the destination. Manual kinematics
@@ -72,18 +72,23 @@ Each stage ends by starting `StageCompleteScene` with `{ stage, score, nextScene
    only open when the correct transfer case + transmission are selected
    (reverse→R, slippery→HL, climb→L+1, cruise→H+D/OD). Teaches terrain→gear mapping.
    Uses signed-speed bicycle yaw so reverse steering emerges from motion direction.
+   Transfer-case range changes are rejected unless the vehicle is stopped and the
+   transmission is in N, matching TM drivetrain-protection guidance.
 4. **Technical Off-Road** (`Stage4Scene`) — **side view** with a terrain heightmap
    and pitch/roll indicators. Steep climb (needs low range + momentum), descent
    (engine braking), side-slope rollover meter, 3-wheel/traction-loss, water
    fording. Uses **signed speed** (negative = reverse); P holds, N rolls with
    gravity, forward/R drive.
+   Source note: TM 9-2320-280-10 lists 60% grade and 40% side-slope capabilities as
+   textual performance values, but no verified slope illustration. The verified
+   illustrated HMMWV slope/climb figure is TC 21-305-20/AFMAN 24-306(I), Figure 7-13.
 5. **Trailer Parking** (`Stage5Scene`) — top-down articulated **water trailer
    (M149)**. Intro shows a real trailer photo + explains reverse steering. Park the
    trailer in a marked bay (aligned within 14°, stopped ~1s). Jackknife warning
    when articulation > ~77°.
 6. **Pre/Post Checks** (`Stage6Scene`) — photo-led inspection checklist. Covers
    tire pressure/condition, engine oil, fluid reservoirs, belts/hoses/wiring, and
-   post-drive leak/tire/hub checks.
+   air restriction, post-drive leak/tire/hub checks.
 7. **Gauge Scan** (`Stage7Scene`) — close-up gauge quiz. Tap oil pressure,
    temperature, fuel, speed/odometer, and voltmeter hotspots, then answer the
    multiple-choice operational question. Wrong answers reduce score.

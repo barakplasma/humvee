@@ -8,7 +8,7 @@ import { fitCover } from "./MenuScene.js";
 
 const STARTUP_STEPS = [
   { key: "startup_step_pbrake", target: "pbrake" },
-  { key: "startup_step_park", target: "trans" },
+  { key: "startup_step_neutral", target: "trans" },
   { key: "startup_step_run", target: "ignition" },
   { key: "startup_step_wait", target: null, auto: true },
   { key: "startup_step_start", target: "ignition" },

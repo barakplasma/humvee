@@ -69,6 +69,7 @@ export default class Stage3Scene extends Phaser.Scene {
     this.vehicle = this.add.image(TRAIL_X, 2420, assetKey("humvee_topdown")).setDepth(10).setScale(0.7);
     this.vehicle.rotation = 0;
     this.speed = 0;
+    this.lastRange = "H";
     this.cameras.main.startFollow(this.vehicle, true, 0.08, 0.08);
 
     this.dc = new DriveControls(this, {
@@ -77,6 +78,14 @@ export default class Stage3Scene extends Phaser.Scene {
       range: "H",
       onGear: (v) => {
         if (v === "R") this._sawR = true;
+      },
+      onRange: (v) => {
+        if (Math.abs(this.speed) > 5 || this.dc.gear !== "N") {
+          this.dc.setRange(this.lastRange);
+          this.dialog.toast(t("s3_range_shift_stop"), { color: "#d8a54a", duration: 1700 });
+          return;
+        }
+        this.lastRange = v;
       },
     });
     this.dc.container.setScrollFactor(0);
