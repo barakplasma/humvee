@@ -5,11 +5,56 @@ import Dialog from "../ui/Dialog.js";
 import { addFullscreenButton } from "../ui/fullscreen.js";
 
 const GAUGES = [
-  { key: "oil", title: "s7_oil_title", body: "s7_oil_body", x: 166, y: 74 },
-  { key: "temp", title: "s7_temp_title", body: "s7_temp_body", x: 545, y: 82 },
-  { key: "fuel", title: "s7_fuel_title", body: "s7_fuel_body", x: 176, y: 269 },
-  { key: "speed", title: "s7_speed_title", body: "s7_speed_body", x: 371, y: 248 },
-  { key: "volt", title: "s7_volt_title", body: "s7_volt_body", x: 526, y: 280 },
+  {
+    key: "oil",
+    title: "s7_oil_title",
+    body: "s7_oil_body",
+    question: "s7_oil_question",
+    choices: ["s7_oil_choice_stop", "s7_choice_ignore", "s7_choice_speedup", "s7_choice_lights"],
+    correct: 0,
+    x: 166,
+    y: 74,
+  },
+  {
+    key: "temp",
+    title: "s7_temp_title",
+    body: "s7_temp_body",
+    question: "s7_temp_question",
+    choices: ["s7_temp_choice_reduce", "s7_choice_ignore", "s7_choice_park", "s7_choice_lights"],
+    correct: 0,
+    x: 545,
+    y: 82,
+  },
+  {
+    key: "fuel",
+    title: "s7_fuel_title",
+    body: "s7_fuel_body",
+    question: "s7_fuel_question",
+    choices: ["s7_fuel_choice_plan", "s7_choice_ignore", "s7_choice_park", "s7_choice_lights"],
+    correct: 0,
+    x: 176,
+    y: 269,
+  },
+  {
+    key: "speed",
+    title: "s7_speed_title",
+    body: "s7_speed_body",
+    question: "s7_speed_question",
+    choices: ["s7_speed_choice_adjust", "s7_choice_ignore", "s7_choice_park", "s7_choice_lights"],
+    correct: 0,
+    x: 371,
+    y: 248,
+  },
+  {
+    key: "volt",
+    title: "s7_volt_title",
+    body: "s7_volt_body",
+    question: "s7_volt_question",
+    choices: ["s7_volt_choice_check", "s7_choice_ignore", "s7_choice_speedup", "s7_choice_park"],
+    correct: 0,
+    x: 526,
+    y: 280,
+  },
 ];
 
 export default class Stage7Scene extends Phaser.Scene {
@@ -20,6 +65,7 @@ export default class Stage7Scene extends Phaser.Scene {
   create() {
     this.dialog = new Dialog(this);
     this.seen = new Set();
+    this.mistakes = 0;
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, COLORS.armyGreenDark, 1).setOrigin(0);
     this.banner = this.dialog.banner(t("s7_obj"));
@@ -86,15 +132,32 @@ export default class Stage7Scene extends Phaser.Scene {
   }
 
   reviewGauge(gauge) {
+    if (this.seen.has(gauge.key)) {
+      this.dialog.showCard({
+        title: t(gauge.title),
+        body: t(gauge.body),
+        imageKey: assetKey("closeup_gauges"),
+      });
+      return;
+    }
+
     this.dialog.showCard({
       title: t(gauge.title),
-      body: t(gauge.body),
+      body: `${t(gauge.question)}\n\n${t(gauge.body)}`,
       imageKey: assetKey("closeup_gauges"),
-      onClose: () => {
-        this.seen.add(gauge.key);
-        this.drawRing(gauge.key);
-        this.updateProgress();
-        if (this.seen.size === GAUGES.length) this.finish();
+      choices: gauge.choices.map((key) => t(key)),
+      correctIndex: gauge.correct,
+      onAnswer: (correct) => {
+        if (correct) {
+          this.seen.add(gauge.key);
+          this.drawRing(gauge.key);
+          this.dialog.toast(t("s7_correct"), { color: "#6fbf5a", duration: 1300 });
+          this.updateProgress();
+          if (this.seen.size === GAUGES.length) this.finish();
+        } else {
+          this.mistakes++;
+          this.dialog.toast(t("s7_wrong"), { color: "#d85a4a", duration: 1700 });
+        }
       },
     });
   }
@@ -104,8 +167,9 @@ export default class Stage7Scene extends Phaser.Scene {
   }
 
   finish() {
+    const score = Math.max(0, 100 - this.mistakes * 10);
     this.time.delayedCall(900, () =>
-      this.scene.start("StageCompleteScene", { stage: 7, score: 100, nextScene: null })
+      this.scene.start("StageCompleteScene", { stage: 7, score, nextScene: null })
     );
   }
 }

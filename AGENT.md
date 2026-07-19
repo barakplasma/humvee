@@ -84,9 +84,9 @@ Each stage ends by starting `StageCompleteScene` with `{ stage, score, nextScene
 6. **Pre/Post Checks** (`Stage6Scene`) — photo-led inspection checklist. Covers
    tire pressure/condition, engine oil, fluid reservoirs, belts/hoses/wiring, and
    post-drive leak/tire/hub checks.
-7. **Gauge Scan** (`Stage7Scene`) — close-up gauge lesson. Tap oil pressure,
-   temperature, fuel, speed/odometer, and voltmeter hotspots to learn what each
-   reading means while driving.
+7. **Gauge Scan** (`Stage7Scene`) — close-up gauge quiz. Tap oil pressure,
+   temperature, fuel, speed/odometer, and voltmeter hotspots, then answer the
+   multiple-choice operational question. Wrong answers reduce score.
 
 ### Trailer kinematics (Stage 5)
 Bicycle model + rear-hitch trailer. Tractor rear axle `P`, heading `th`; trailer

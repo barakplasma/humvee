@@ -189,21 +189,37 @@ export const en = {
     "After driving, recheck tire damage and feel near hubs cautiously for abnormal heat. Heat, smell, or fresh noise can point to brake or bearing trouble.",
 
   // ---- Stage 7 gauges ----
-  s7_obj: "Tap every highlighted gauge and learn what to scan while driving.",
-  s7_progress: "Gauges reviewed: {done} / {total}",
+  s7_obj: "Tap every highlighted gauge and answer the quiz.",
+  s7_progress: "Gauge quiz: {done} / {total}",
+  s7_correct: "Correct.",
+  s7_wrong: "Not quite. Try that gauge again.",
   s7_oil_title: "Oil Pressure",
   s7_oil_body:
     "Oil pressure confirms the engine is being lubricated. A sudden drop, flicker, or reading outside the normal range means stop safely and investigate.",
+  s7_oil_question: "The oil pressure drops suddenly while driving. What should you do?",
+  s7_oil_choice_stop: "Stop safely and investigate",
   s7_temp_title: "Engine Temperature",
   s7_temp_body:
     "Temperature shows cooling-system health. Rising temperature under load means reduce strain, check airflow, coolant, fan belts, and leaks.",
+  s7_temp_question: "The temperature gauge climbs under load. What is the best first response?",
+  s7_temp_choice_reduce: "Reduce strain and check cooling",
   s7_fuel_title: "Fuel Level",
   s7_fuel_body:
     "Fuel level is part of route planning. Off-road work and low range burn more fuel than steady road driving.",
+  s7_fuel_question: "You are entering a long low-range off-road section. What does this gauge affect?",
+  s7_fuel_choice_plan: "Fuel and route planning",
   s7_speed_title: "Speedometer / Odometer",
   s7_speed_body:
     "Speed helps you obey limits and choose the right gear range. The odometer supports fuel, maintenance, and mission tracking.",
+  s7_speed_question: "Why scan speed while choosing gear range?",
+  s7_speed_choice_adjust: "Match speed to limits and gear range",
   s7_volt_title: "Voltmeter",
   s7_volt_body:
     "Voltage shows charging-system health. Low voltage can mean battery or alternator trouble; unusually high voltage can damage equipment.",
+  s7_volt_question: "The voltmeter shows an abnormal charge reading. What does that suggest?",
+  s7_volt_choice_check: "Check the charging system",
+  s7_choice_ignore: "Ignore it if the engine runs",
+  s7_choice_speedup: "Speed up to clear the problem",
+  s7_choice_lights: "Switch lighting modes",
+  s7_choice_park: "Shift the transmission to P",
 };

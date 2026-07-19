@@ -34,7 +34,8 @@ The game has seven stages:
 5. Trailer Parking: articulated M149-style trailer reversing and parking.
 6. Pre/Post Checks: tire pressure/condition, oil, fluids, belts/hoses/wiring, leaks,
    tires, and hubs.
-7. Gauge Scan: oil pressure, temperature, fuel, speed/odometer, and voltmeter.
+7. Gauge Scan: oil pressure, temperature, fuel, speed/odometer, and voltmeter
+   multiple-choice quiz.
 
 All stages are directly selectable from the menu. Best score is tracked per stage in
 localStorage.
@@ -50,7 +51,7 @@ localStorage.
 - Use large tap targets and scene-level Phaser pointer handling for controls embedded
   in containers.
 - Prefer concrete tasks over passive reading: tap controls, select gears, drive,
-  reverse, inspect, and identify gauges.
+  reverse, inspect, and answer gauge questions.
 - Keep text concise enough for mobile cards, and add every display string through
   `js/i18n/en.js` and `js/i18n/he.js`.
 - Top-down driving should feel like a vehicle, not a rotateable sprite: steering

@@ -15,7 +15,7 @@ export default class Dialog {
    * Modal teaching card with a title, body and a dismiss button.
    * Returns nothing; calls onClose when dismissed.
    */
-  showCard({ title, body, button, onClose, imageKey }) {
+  showCard({ title, body, button, onClose, imageKey, choices, correctIndex, onAnswer }) {
     const s = this.scene;
     const cont = s.add.container(0, 0).setDepth(2000).setScrollFactor(0);
 
@@ -26,8 +26,9 @@ export default class Dialog {
     cont.add(overlay);
 
     const hasImage = Boolean(imageKey);
+    const hasChoices = Array.isArray(choices) && choices.length > 0;
     const cw = hasImage ? 860 : 720;
-    const ch = hasImage ? 500 : 360;
+    const ch = hasImage || hasChoices ? 520 : 360;
     const cx = GAME_WIDTH / 2;
     const cy = GAME_HEIGHT / 2;
 
@@ -47,6 +48,7 @@ export default class Dialog {
       })
       .setOrigin(0.5, 0);
     cont.add(titleText);
+    fitText(titleText, cw - 60, 76, 24);
 
     let bodyX = cx;
     let bodyY = titleText.y + titleText.height + 24;
@@ -54,11 +56,11 @@ export default class Dialog {
     if (hasImage) {
       const photo = s.add.image(cx - 220, cy + 10, imageKey);
       const maxW = 360;
-      const maxH = 250;
+      const maxH = hasChoices ? 210 : 250;
       photo.setScale(Math.min(maxW / photo.width, maxH / photo.height));
       cont.add(photo);
       bodyX = cx + 190;
-      bodyY = cy - 160;
+      bodyY = cy - 170;
       bodyWidth = 380;
     }
 
@@ -73,6 +75,28 @@ export default class Dialog {
       })
       .setOrigin(hasImage ? 0 : 0.5, 0);
     cont.add(bodyText);
+    const choicesTop = cy + ch / 2 - (hasChoices ? 142 : 0);
+    const bodyMaxH = (hasChoices ? choicesTop - 18 : cy + ch / 2 - 98) - bodyY;
+    fitText(bodyText, bodyWidth, bodyMaxH, hasImage ? 15 : 16);
+
+    if (hasChoices) {
+      choices.forEach((choice, i) => {
+        const bx = cx + (i % 2 === 0 ? -190 : 190);
+        const by = choicesTop + Math.floor(i / 2) * 58;
+        const choiceBtn = this.makeButton(
+          bx,
+          by,
+          choice,
+          () => {
+            cont.destroy();
+            if (onAnswer) onAnswer(i === correctIndex, i);
+          },
+          { width: 350, height: 50, fontSize: "18px", color: COLORS.panelLight }
+        );
+        cont.add(choiceBtn);
+      });
+      return cont;
+    }
 
     const btn = this.makeButton(cx, cy + ch / 2 - 44, button || t("btn_got_it"), () => {
       cont.destroy();
@@ -172,8 +196,11 @@ export default class Dialog {
         fontSize: opts.fontSize || "24px",
         color: "#f2ecd8",
         fontStyle: "bold",
+        align: "center",
+        wordWrap: { width: w - 18 },
       })
       .setOrigin(0.5);
+    fitText(label, w - 18, h - 10, 13);
     cont.add([bg, label]);
     bg.on("pointerover", () => bg.setFillStyle(COLORS.panelLight, 1));
     bg.on("pointerout", () => bg.setFillStyle(opts.color || COLORS.armyGreen, 1));
@@ -186,5 +213,13 @@ export default class Dialog {
     cont.bg = bg;
     cont.label = label;
     return cont;
+  }
+}
+
+function fitText(text, maxW, maxH, minPx) {
+  let size = parseInt(text.style.fontSize, 10) || 18;
+  while ((text.width > maxW || text.height > maxH) && size > minPx) {
+    size -= 1;
+    text.setFontSize(size);
   }
 }
