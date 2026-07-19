@@ -193,8 +193,15 @@ export default class Stage4Scene extends Phaser.Scene {
     const slope = this.slopeAt(this.carX); // >0 downhill, <0 uphill (screen y-down)
     const grade = slope * 900; // resistance uphill / assist downhill
 
-    if (dir === 0) {
-      this.speed -= 500 * dt;
+    if (this.dc.gear === "P") {
+      // Park: hold position — coast any residual motion to a stop, no rolling.
+      const d = 600 * dt;
+      this.speed = this.speed > 0 ? Math.max(0, this.speed - d) : Math.min(0, this.speed + d);
+    } else if (this.dc.gear === "N") {
+      // Neutral: no drive, but gravity + drag still act (can roll on a slope).
+      this.speed += grade * dt;
+      const drag = (100 + this.dc.brakeInput * 700) * dt;
+      this.speed = this.speed > 0 ? Math.max(0, this.speed - drag) : Math.min(0, this.speed + drag);
     } else {
       this.speed += this.dc.throttle * 380 * torque * dt * dir;
       this.speed += grade * dt; // gravity along slope

@@ -149,16 +149,19 @@ export default class Stage1Scene extends Phaser.Scene {
 
   onHotspot(hs) {
     if (this.phase === "tour") {
+      // If this tap reviews the final control, begin the start-up sequence only
+      // once the player dismisses the card (not on a background timer).
+      const isLast = !hs.seen && this.seen.size + 1 === CONTROLS.length;
       this.dialog.showCard({
         title: t(hs.control.nameKey),
         body: t(hs.control.descKey),
+        onClose: isLast ? () => this.startStartup() : undefined,
       });
       if (!hs.seen) {
         hs.seen = true;
         this.seen.add(hs.control.id);
         this.drawRing(hs);
         this.updateProgress();
-        if (this.seen.size === CONTROLS.length) this.time.delayedCall(400, () => this.startStartup());
       }
     } else if (this.phase === "startup") {
       this.handleStartupTap(hs);
