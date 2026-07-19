@@ -1,0 +1,175 @@
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONT } from "../theme.js";
+import { t, isRTL } from "../i18n/i18n.js";
+
+// Reusable teaching cards, toasts and objective banners. One instance per scene.
+export default class Dialog {
+  constructor(scene) {
+    this.scene = scene;
+  }
+
+  align() {
+    return isRTL() ? "right" : "left";
+  }
+
+  /**
+   * Modal teaching card with a title, body and a dismiss button.
+   * Returns nothing; calls onClose when dismissed.
+   */
+  showCard({ title, body, button, onClose }) {
+    const s = this.scene;
+    const cont = s.add.container(0, 0).setDepth(2000).setScrollFactor(0);
+
+    const overlay = s.add
+      .rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.6)
+      .setOrigin(0)
+      .setInteractive();
+    cont.add(overlay);
+
+    const cw = 720;
+    const ch = 360;
+    const cx = GAME_WIDTH / 2;
+    const cy = GAME_HEIGHT / 2;
+
+    const panel = s.add
+      .rectangle(cx, cy, cw, ch, COLORS.panel, 0.98)
+      .setStrokeStyle(3, COLORS.sand);
+    cont.add(panel);
+
+    const titleText = s.add
+      .text(cx, cy - ch / 2 + 40, title, {
+        fontFamily: FONT,
+        fontSize: "34px",
+        color: "#d8a54a",
+        fontStyle: "bold",
+        align: "center",
+        wordWrap: { width: cw - 60 },
+      })
+      .setOrigin(0.5, 0);
+    cont.add(titleText);
+
+    const bodyText = s.add
+      .text(cx, titleText.y + titleText.height + 24, body, {
+        fontFamily: FONT,
+        fontSize: "23px",
+        color: "#f2ecd8",
+        align: this.align(),
+        lineSpacing: 6,
+        wordWrap: { width: cw - 80 },
+      })
+      .setOrigin(0.5, 0);
+    cont.add(bodyText);
+
+    const btn = this.makeButton(cx, cy + ch / 2 - 44, button || t("btn_got_it"), () => {
+      cont.destroy();
+      if (onClose) onClose();
+    });
+    cont.add(btn);
+    return cont;
+  }
+
+  /** Transient banner near the top; auto-fades. */
+  toast(text, { color = "#f2ecd8", bg = COLORS.panel, duration = 2200 } = {}) {
+    const s = this.scene;
+    const y = 90;
+    const label = s.add
+      .text(GAME_WIDTH / 2, y, text, {
+        fontFamily: FONT,
+        fontSize: "26px",
+        color,
+        align: "center",
+        backgroundColor: "rgba(0,0,0,0.001)",
+        padding: { x: 18, y: 10 },
+        wordWrap: { width: GAME_WIDTH - 200 },
+      })
+      .setOrigin(0.5)
+      .setDepth(1800)
+      .setScrollFactor(0);
+    const plate = s.add
+      .rectangle(GAME_WIDTH / 2, y, label.width + 36, label.height + 20, bg, 0.9)
+      .setDepth(1799)
+      .setScrollFactor(0);
+    s.tweens.add({
+      targets: [label, plate],
+      alpha: 0,
+      delay: duration,
+      duration: 500,
+      onComplete: () => {
+        label.destroy();
+        plate.destroy();
+      },
+    });
+    return label;
+  }
+
+  /** Persistent objective banner at the top-left (or top-right in RTL). */
+  banner(text) {
+    const s = this.scene;
+    const rtl = isRTL();
+    const x = rtl ? GAME_WIDTH - 24 : 24;
+    const label = s.add
+      .text(x, 20, text, {
+        fontFamily: FONT,
+        fontSize: "22px",
+        color: "#f2ecd8",
+        align: this.align(),
+        wordWrap: { width: 560 },
+      })
+      .setOrigin(rtl ? 1 : 0, 0)
+      .setDepth(900)
+      .setScrollFactor(0);
+    const plate = s.add
+      .rectangle(
+        rtl ? GAME_WIDTH - 12 : 12,
+        12,
+        label.width + 24,
+        label.height + 16,
+        COLORS.panel,
+        0.7
+      )
+      .setOrigin(rtl ? 1 : 0, 0)
+      .setDepth(899)
+      .setScrollFactor(0);
+    return {
+      setText: (str) => {
+        label.setText(str);
+        plate.setSize(label.width + 24, label.height + 16);
+      },
+      destroy: () => {
+        label.destroy();
+        plate.destroy();
+      },
+    };
+  }
+
+  /** A rounded pill button as a container; returns it so callers can position/add. */
+  makeButton(x, y, text, onClick, opts = {}) {
+    const s = this.scene;
+    const w = opts.width || 240;
+    const h = opts.height || 56;
+    const cont = s.add.container(x, y).setScrollFactor(0);
+    const bg = s.add
+      .rectangle(0, 0, w, h, opts.color || COLORS.armyGreen, 1)
+      .setStrokeStyle(2, COLORS.sand)
+      .setInteractive({ useHandCursor: true });
+    const label = s.add
+      .text(0, 0, text, {
+        fontFamily: FONT,
+        fontSize: opts.fontSize || "24px",
+        color: "#f2ecd8",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
+    cont.add([bg, label]);
+    bg.on("pointerover", () => bg.setFillStyle(COLORS.panelLight, 1));
+    bg.on("pointerout", () => bg.setFillStyle(opts.color || COLORS.armyGreen, 1));
+    bg.on("pointerdown", () => cont.setScale(0.96));
+    bg.on("pointerup", () => {
+      cont.setScale(1);
+      if (onClick) onClick();
+    });
+    cont.setSize(w, h);
+    cont.bg = bg;
+    cont.label = label;
+    return cont;
+  }
+}
