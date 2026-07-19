@@ -1,5 +1,8 @@
 import { createConfig } from "./config.js";
+import { initBugTracking } from "./bug-tracking.js";
 import { initLocaleFromStorage } from "./i18n/i18n.js";
+
+initBugTracking();
 
 // Restore the player's saved language before any scene draws text.
 initLocaleFromStorage();

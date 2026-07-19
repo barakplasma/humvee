@@ -21,8 +21,11 @@ export default class DriveControls {
 
     this._gasHeld = false;
     this._brakeHeld = false;
+    this._gasPointerId = null;
+    this._brakePointerId = null;
     this._dragSteer = 0;
     this._dragPointerId = null;
+    this._pointerDownHandler = null;
     this._pointerMoveHandler = null;
     this._pointerUpHandler = null;
 
@@ -31,6 +34,7 @@ export default class DriveControls {
     this._tiltSteer = 0;
     this._tiltNeutral = null;
     this._rawTilt = 0;
+    this._tiltSmoothed = 0;
     this._tiltPermissionHandler = null;
 
     // Gamepad steering state. Phaser exposes the same leftStick/buttons API
@@ -45,6 +49,7 @@ export default class DriveControls {
     this.buildPedals();
     if (opts.selectors) this.buildSelectors();
     this.buildHUD();
+    this.bindPointerControls();
     this.bindKeyboard();
     this.bindTilt();
     this.bindGamepad();
@@ -70,20 +75,7 @@ export default class DriveControls {
     zone.setFillStyle(0xffffff, 0.001);
     this.container.add(zone);
 
-    zone.on("pointerdown", (p) => {
-      this._dragPointerId = p.id;
-      this.recenterTilt(); // tapping the wheel re-centres tilt steering
-      this.updateSteerFromPointer(p);
-    });
-    this._pointerMoveHandler = (p) => {
-      if (this._dragPointerId === p.id) this.updateSteerFromPointer(p);
-    };
-    s.input.on("pointermove", this._pointerMoveHandler);
-    this._pointerUpHandler = (p) => {
-      if (this._dragPointerId === p.id) this._dragPointerId = null;
-    };
-    s.input.on("pointerup", this._pointerUpHandler);
-    s.input.on("pointerupoutside", this._pointerUpHandler);
+    zone.on("pointerdown", (p) => this.startWheelDrag(p));
 
     // Hint (useful on phones; harmless elsewhere).
     this.tiltHint = s.add
@@ -101,6 +93,13 @@ export default class DriveControls {
   updateSteerFromPointer(p) {
     const dx = p.x - this.wheelX;
     this._dragSteer = Phaser.Math.Clamp(dx / this.wheelR, -1, 1);
+  }
+
+  startWheelDrag(p) {
+    if (this._dragPointerId !== null) return;
+    this._dragPointerId = p.id;
+    this.recenterTilt(); // tapping the wheel re-centres tilt steering
+    this.updateSteerFromPointer(p);
   }
 
   drawWheel(steer) {
@@ -150,21 +149,70 @@ export default class DriveControls {
     cont.add([bg, txt]);
     this.container.add(cont);
 
-    const press = () => {
-      cont.setScale(0.94);
-      if (kind === "gas") this._gasHeld = true;
-      else this._brakeHeld = true;
-    };
-    const release = () => {
-      cont.setScale(1);
-      if (kind === "gas") this._gasHeld = false;
-      else this._brakeHeld = false;
-    };
+    cont._kind = kind;
+    cont._hit = { x: x - w / 2, y: y - h / 2, w, h };
+    const press = (p) => this.pressPedal(kind, p && p.id);
+    const release = (p) => this.releasePedal(kind, p && p.id);
     bg.on("pointerdown", press);
     bg.on("pointerup", release);
-    bg.on("pointerout", release);
     bg.on("pointerupoutside", release);
     return cont;
+  }
+
+  pressPedal(kind, pointerId = null) {
+    const cont = kind === "gas" ? this.gasPedal : this.brakePedal;
+    if (!cont) return;
+    cont.setScale(0.94);
+    if (kind === "gas") {
+      this._gasHeld = true;
+      this._gasPointerId = pointerId;
+    } else {
+      this._brakeHeld = true;
+      this._brakePointerId = pointerId;
+    }
+  }
+
+  releasePedal(kind, pointerId = null) {
+    const cont = kind === "gas" ? this.gasPedal : this.brakePedal;
+    const activeId = kind === "gas" ? this._gasPointerId : this._brakePointerId;
+    if (activeId !== null && pointerId !== null && activeId !== pointerId) return;
+    if (cont) cont.setScale(1);
+    if (kind === "gas") {
+      this._gasHeld = false;
+      this._gasPointerId = null;
+    } else {
+      this._brakeHeld = false;
+      this._brakePointerId = null;
+    }
+  }
+
+  bindPointerControls() {
+    const s = this.scene;
+    const inCircle = (p, x, y, r) => Phaser.Math.Distance.Between(p.x, p.y, x, y) <= r;
+    const inRect = (p, hit) => p.x >= hit.x && p.x <= hit.x + hit.w && p.y >= hit.y && p.y <= hit.y + hit.h;
+
+    this._pointerDownHandler = (p) => {
+      // Phaser 4 pointer events are unified for mouse and touch. Using the
+      // Scene Input Plugin directly keeps these controls independent of
+      // container hit-test edge cases.
+      if (this.selectFromPointer(p, inRect)) return;
+      if (this.gasPedal && inRect(p, this.gasPedal._hit)) this.pressPedal("gas", p.id);
+      else if (this.brakePedal && inRect(p, this.brakePedal._hit)) this.pressPedal("brake", p.id);
+      else if (inCircle(p, this.wheelX, this.wheelY, this.wheelR + 28)) this.startWheelDrag(p);
+    };
+    this._pointerMoveHandler = (p) => {
+      if (this._dragPointerId === p.id) this.updateSteerFromPointer(p);
+    };
+    this._pointerUpHandler = (p) => {
+      this.releasePedal("gas", p.id);
+      this.releasePedal("brake", p.id);
+      if (this._dragPointerId === p.id) this._dragPointerId = null;
+    };
+
+    s.input.on("pointerdown", this._pointerDownHandler);
+    s.input.on("pointermove", this._pointerMoveHandler);
+    s.input.on("pointerup", this._pointerUpHandler);
+    s.input.on("pointerupoutside", this._pointerUpHandler);
   }
 
   // ---- Gear selectors (transmission + transfer case) ----
@@ -198,6 +246,7 @@ export default class DriveControls {
     const cont = s.add.container(x, y).setDepth(650);
     const cellH = 46;
     const w = 96;
+    const hitCells = [];
 
     const titleTxt = s.add
       .text(w / 2, -30, title, {
@@ -219,17 +268,32 @@ export default class DriveControls {
       const label = s.add
         .text(w / 2, cy, opt, { fontFamily: FONT, fontSize: "22px", color: "#f2ecd8", fontStyle: "bold" })
         .setOrigin(0.5);
-      rect.on("pointerup", () => {
-        this.setSelector(cells, opt);
-        onSelect(opt);
-      });
       cells[opt] = { rect, label };
+      hitCells.push({
+        opt,
+        hit: { x, y: y + cy - cellH / 2, w, h: cellH },
+      });
       cont.add([rect, label]);
     });
     this.container.add(cont);
     this.setSelector(cells, initial);
     cont._cells = cells;
+    cont._hitCells = hitCells;
+    cont._onSelect = onSelect;
     return cont;
+  }
+
+  selectFromPointer(p, inRect) {
+    const selectors = [this.transSelector, this.transferSelector];
+    for (const selector of selectors) {
+      if (!selector || !selector._hitCells) continue;
+      const cell = selector._hitCells.find(({ hit }) => inRect(p, hit));
+      if (!cell) continue;
+      this.setSelector(selector._cells, cell.opt);
+      selector._onSelect(cell.opt);
+      return true;
+    }
+    return false;
   }
 
   setSelector(cells, value) {
@@ -309,8 +373,13 @@ export default class DriveControls {
       else tilt = e.gamma || 0; // portrait / default
       this._rawTilt = tilt;
       if (this._tiltNeutral === null) this._tiltNeutral = tilt;
-      const MAX_DEG = 22;
-      this._tiltSteer = Phaser.Math.Clamp((tilt - this._tiltNeutral) / MAX_DEG, -1, 1);
+      const DEADZONE_DEG = 2.5;
+      const MAX_DEG = 34;
+      this._tiltSmoothed = Phaser.Math.Linear(this._tiltSmoothed, tilt, 0.18);
+      let delta = this._tiltSmoothed - this._tiltNeutral;
+      if (Math.abs(delta) < DEADZONE_DEG) delta = 0;
+      else delta -= Math.sign(delta) * DEADZONE_DEG;
+      this._tiltSteer = Phaser.Math.Clamp(delta / (MAX_DEG - DEADZONE_DEG), -1, 1);
       this._tiltActive = true;
     };
     this._tiltHandler = handler;
@@ -431,6 +500,7 @@ export default class DriveControls {
   destroy() {
     if (this._destroyed) return;
     this._destroyed = true;
+    if (this._pointerDownHandler) this.scene.input.off("pointerdown", this._pointerDownHandler);
     if (this._pointerMoveHandler) this.scene.input.off("pointermove", this._pointerMoveHandler);
     if (this._pointerUpHandler) {
       this.scene.input.off("pointerup", this._pointerUpHandler);

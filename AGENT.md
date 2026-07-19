@@ -16,7 +16,7 @@ Live site (GitHub Pages): `https://barakplasma.github.io/humvee/`
 
 ## Tech + architecture
 
-- **Phaser 3.87.0**, vendored locally at `js/vendor/phaser.min.js` (no CDN, no
+- **Phaser 4.2.1**, vendored locally at `js/vendor/phaser.min.js` (no CDN, no
   build step, offline-capable). Loaded as a global `Phaser` in `index.html`.
 - **Vanilla ES modules** for our own code (`<script type="module">`). No bundler,
   no npm runtime deps. This must stay true — anything requiring a build breaks the
@@ -104,6 +104,18 @@ Steering input priority each frame: **keyboard > wheel drag > device tilt > cent
 When embedding in a scrolling scene, set `dc.container.setScrollFactor(0)` so the
 HUD/wheel/pedals stay pinned (they're built in screen space). `Dialog` outputs are
 already `scrollFactor(0)`.
+
+### Recommended Phaser skills
+Before Phaser engine, scene lifecycle, or input work, install and use the relevant
+official Phaser Codex skills from:
+`https://github.com/phaserjs/phaser/tree/master/skills`
+
+For this repo, the default recommended set is:
+- `v3-to-v4-migration` for Phaser 4 migration and API compatibility work.
+- `input-keyboard-mouse-touch` for keyboard, pointer, touch, drag, and gamepad
+  controls.
+- `events-system` for scene/input event subscription and cleanup patterns.
+- `scenes` for scene lifecycle, starting/stopping scenes, and shutdown behavior.
 
 ## Fullscreen (`js/ui/fullscreen.js`)
 `addFullscreenButton(scene, x, y)` — must be triggered by a pointer gesture (it is).
