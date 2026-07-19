@@ -1,5 +1,6 @@
 import { GAME_WIDTH, GAME_HEIGHT, COLORS } from "./theme.js";
 import BootScene from "./scenes/BootScene.js";
+import AboutScene from "./scenes/AboutScene.js";
 import MenuScene from "./scenes/MenuScene.js";
 import Stage1Scene from "./scenes/Stage1Scene.js";
 import Stage2Scene from "./scenes/Stage2Scene.js";
@@ -8,6 +9,7 @@ import Stage4Scene from "./scenes/Stage4Scene.js";
 import Stage5Scene from "./scenes/Stage5Scene.js";
 import Stage6Scene from "./scenes/Stage6Scene.js";
 import Stage7Scene from "./scenes/Stage7Scene.js";
+import Stage8Scene from "./scenes/Stage8Scene.js";
 import StageCompleteScene from "./scenes/StageCompleteScene.js";
 import CreditsScene from "./scenes/CreditsScene.js";
 
@@ -31,6 +33,7 @@ export function createConfig() {
     render: { pixelArt: false, antialias: true, roundPixels: true },
     scene: [
       BootScene,
+      AboutScene,
       MenuScene,
       Stage1Scene,
       Stage2Scene,
@@ -39,6 +42,7 @@ export function createConfig() {
       Stage5Scene,
       Stage6Scene,
       Stage7Scene,
+      Stage8Scene,
       StageCompleteScene,
       CreditsScene,
     ],

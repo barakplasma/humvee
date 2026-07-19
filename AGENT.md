@@ -45,7 +45,7 @@ js/ui/LangSwitch.js      EN/HE toggle (restarts scene to re-render + flip RTL)
 js/ui/fullscreen.js      addFullscreenButton(scene, x, y)
 js/scenes/BootScene.js   resolves art (override->procedural) + procedural generators
 js/scenes/MenuScene.js   title, stage cards (count-driven layout), lang, fullscreen
-js/scenes/Stage1..5.js   the five stages (see below)
+js/scenes/Stage1..8.js   the eight stages (see below)
 js/scenes/StageCompleteScene.js  score summary + next/menu
 assets/photos/           real museum photos (override AI/procedural)
 assets/ai/               AI-generated alternates (Gemini via OpenRouter)
@@ -53,7 +53,7 @@ assets/overrides.json    id -> image path map (the only art-wiring file)
 .github/workflows/deploy-pages.yml   GitHub Pages deploy
 ```
 
-## The seven stages
+## The eight stages
 
 Stages unlock sequentially (complete N → unlock N+1), tracked in `progress.js`.
 Each stage ends by starting `StageCompleteScene` with `{ stage, score, nextScene }`.
@@ -87,6 +87,11 @@ Each stage ends by starting `StageCompleteScene` with `{ stage, score, nextScene
 7. **Gauge Scan** (`Stage7Scene`) — close-up gauge quiz. Tap oil pressure,
    temperature, fuel, speed/odometer, and voltmeter hotspots, then answer the
    multiple-choice operational question. Wrong answers reduce score.
+8. **Humvee Trivia** (`Stage8Scene`) — multiple-choice trivia based on the English
+   and Hebrew Wikipedia pages for Humvee:
+   `https://en.wikipedia.org/wiki/Humvee` and `https://he.wikipedia.org/wiki/Humvee`.
+   Keep facts high-level and non-operational: name meaning, manufacturer, service
+   dates, specifications, and replacement-program context.
 
 ### Trailer kinematics (Stage 5)
 Bicycle model + rear-hitch trailer. Tractor rear axle `P`, heading `th`; trailer
@@ -130,11 +135,20 @@ official Phaser Codex skills from:
 `https://github.com/phaserjs/phaser/tree/master/skills`
 
 For this repo, the default recommended set is:
-- `v3-to-v4-migration` for Phaser 4 migration and API compatibility work.
-- `input-keyboard-mouse-touch` for keyboard, pointer, touch, drag, and gamepad
-  controls.
-- `events-system` for scene/input event subscription and cleanup patterns.
-- `scenes` for scene lifecycle, starting/stopping scenes, and shutdown behavior.
+- `v3-to-v4-migration` (`/root/.codex/skills/v3-to-v4-migration/SKILL.md`) for
+  Phaser 4 migration and API compatibility work.
+- `input-keyboard-mouse-touch` (`/root/.codex/skills/input-keyboard-mouse-touch/SKILL.md`)
+  for keyboard, pointer, touch, drag, and gamepad controls.
+- `physics-matter` (`/root/.codex/skills/physics-matter/SKILL.md`) for Matter.js
+  bodies, constraints, sensors, collision filtering, and future rigid-body vehicle
+  or trailer experiments.
+- `events-system` (`/root/.codex/skills/events-system/SKILL.md`) for scene/input
+  event subscription and cleanup patterns.
+- `scenes` (`/root/.codex/skills/scenes/SKILL.md`) for scene lifecycle,
+  starting/stopping scenes, and shutdown behavior.
+
+If more Phaser skills are installed under `/root/.codex/skills`, add them here before
+working on the matching Phaser subsystem.
 
 ## Fullscreen (`js/ui/fullscreen.js`)
 `addFullscreenButton(scene, x, y)` — must be triggered by a pointer gesture (it is).

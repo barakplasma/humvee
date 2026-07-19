@@ -43,7 +43,7 @@ export default class BootScene extends Phaser.Scene {
         if (!this.textures.exists(a.id)) this[`gen_${a.proc}`](a.id);
         resolved[a.id] = a.id;
       });
-      this.scene.start("MenuScene");
+      this.scene.start("AboutScene");
     };
 
     const toLoad = ASSETS.filter((a) => found[a.id]);

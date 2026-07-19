@@ -1,6 +1,6 @@
 // Tracks best scores in localStorage. `unlocked` is kept only for older saves.
 const KEY = "humvee.progress";
-const TOTAL_STAGES = 7;
+const TOTAL_STAGES = 8;
 
 function load() {
   try {

@@ -169,7 +169,7 @@ export default class Stage7Scene extends Phaser.Scene {
   finish() {
     const score = Math.max(0, 100 - this.mistakes * 10);
     this.time.delayedCall(900, () =>
-      this.scene.start("StageCompleteScene", { stage: 7, score, nextScene: null })
+      this.scene.start("StageCompleteScene", { stage: 7, score, nextScene: "Stage8Scene" })
     );
   }
 }

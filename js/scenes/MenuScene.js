@@ -14,6 +14,7 @@ const STAGES = [
   { n: 5, titleKey: "stage5_title", blurbKey: "stage5_blurb", scene: "Stage5Scene" },
   { n: 6, titleKey: "stage6_title", blurbKey: "stage6_blurb", scene: "Stage6Scene" },
   { n: 7, titleKey: "stage7_title", blurbKey: "stage7_blurb", scene: "Stage7Scene" },
+  { n: 8, titleKey: "stage8_title", blurbKey: "stage8_blurb", scene: "Stage8Scene" },
 ];
 
 export default class MenuScene extends Phaser.Scene {

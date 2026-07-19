@@ -24,7 +24,7 @@ perform basic checks before and after driving.
 
 ## Current Experience
 
-The game has seven stages:
+The game has eight stages:
 
 1. Driver Controls: dashboard overview with hotspot lessons and closeup photos, then
    a guided startup checklist.
@@ -36,6 +36,8 @@ The game has seven stages:
    tires, and hubs.
 7. Gauge Scan: oil pressure, temperature, fuel, speed/odometer, and voltmeter
    multiple-choice quiz.
+8. Humvee Trivia: high-level history and specification quiz based on the English and
+   Hebrew Wikipedia pages for Humvee.
 
 All stages are directly selectable from the menu. Best score is tracked per stage in
 localStorage.

@@ -27,6 +27,8 @@ Hebrew is the default language. English is also available from the title screen.
    post-drive tire/hub condition.
 7. **Gauge Scan** — answer quiz questions about oil pressure, temperature, fuel,
    speed/odometer, and voltage readings.
+8. **Humvee Trivia** — answer history and specification questions based on the English
+   and Hebrew Wikipedia pages for Humvee.
 
 ## Controls
 
@@ -34,7 +36,8 @@ On a phone, **tilt to steer** (tap the wheel to re-centre); on desktop use the a
 keys / WASD, a connected gamepad's left stick and triggers, or drag the on-screen wheel.
 Gas/brake are the on-screen pedals. A
 **fullscreen** button (⛶) is on the menu and every stage — best experienced
-fullscreen in landscape.
+fullscreen in landscape. After loading, the opening about page has a Continue button that
+requests fullscreen before entering the menu.
 
 ## Languages
 
