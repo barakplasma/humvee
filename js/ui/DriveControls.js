@@ -217,19 +217,8 @@ export default class DriveControls {
 
   // ---- Gear selectors (transmission + transfer case) ----
   buildSelectors() {
-    this.transSelector = this.makeSelector(
-      40,
-      120,
-      t("transmission_short"),
-      TRANSMISSION,
-      this.gear,
-      (v) => {
-        this.gear = v;
-        if (this.opts.onGear) this.opts.onGear(v);
-      }
-    );
     this.transferSelector = this.makeSelector(
-      170,
+      40,
       120,
       t("transfer_short"),
       TRANSFER,
@@ -237,6 +226,17 @@ export default class DriveControls {
       (v) => {
         this.range = v;
         if (this.opts.onRange) this.opts.onRange(v);
+      }
+    );
+    this.transSelector = this.makeSelector(
+      170,
+      120,
+      t("transmission_short"),
+      TRANSMISSION,
+      this.gear,
+      (v) => {
+        this.gear = v;
+        if (this.opts.onGear) this.opts.onGear(v);
       }
     );
   }

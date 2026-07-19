@@ -1,5 +1,14 @@
 {
   "title_art": "assets/photos/title_art.jpg",
   "dashboard_panel": "assets/photos/dashboard_panel.jpg",
+  "closeup_steering": "assets/photos/closeup_steering.jpg",
+  "closeup_gauges": "assets/photos/closeup_gauges.jpg",
+  "closeup_panel": "assets/photos/closeup_panel.jpg",
+  "closeup_switch": "assets/photos/closeup_switch.jpg",
+  "closeup_shifters": "assets/photos/closeup_shifters.jpg",
+  "inspection_engine": "assets/photos/inspection_engine.jpg",
+  "inspection_tire": "assets/photos/inspection_tire.jpg",
+  "inspection_fluids": "assets/photos/inspection_fluids.jpg",
+  "trail_bg": "assets/photos/trail_bg.jpg",
   "trailer_photo": "assets/photos/trailer.jpg"
 }

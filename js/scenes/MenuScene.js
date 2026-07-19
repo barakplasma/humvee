@@ -12,6 +12,8 @@ const STAGES = [
   { n: 3, titleKey: "stage3_title", blurbKey: "stage3_blurb", scene: "Stage3Scene" },
   { n: 4, titleKey: "stage4_title", blurbKey: "stage4_blurb", scene: "Stage4Scene" },
   { n: 5, titleKey: "stage5_title", blurbKey: "stage5_blurb", scene: "Stage5Scene" },
+  { n: 6, titleKey: "stage6_title", blurbKey: "stage6_blurb", scene: "Stage6Scene" },
+  { n: 7, titleKey: "stage7_title", blurbKey: "stage7_blurb", scene: "Stage7Scene" },
 ];
 
 export default class MenuScene extends Phaser.Scene {
@@ -54,12 +56,18 @@ export default class MenuScene extends Phaser.Scene {
     const gap = 18;
     const margin = 28;
     const n = STAGES.length;
-    const cardW = Math.floor((GAME_WIDTH - margin * 2 - gap * (n - 1)) / n);
-    let x = margin + cardW / 2;
-    const y = 380;
-    STAGES.forEach((st) => {
-      this.makeStageCard(x, y, cardW, st);
-      x += cardW + gap;
+    const compact = n > 5;
+    const cols = compact ? 4 : n;
+    const cardW = Math.floor((GAME_WIDTH - margin * 2 - gap * (cols - 1)) / cols);
+    const cardH = compact ? 190 : 260;
+    STAGES.forEach((st, i) => {
+      const row = Math.floor(i / cols);
+      const col = i % cols;
+      const rowCount = row === 0 ? cols : n - cols;
+      const rowW = cardW * rowCount + gap * (rowCount - 1);
+      const x = GAME_WIDTH / 2 - rowW / 2 + cardW / 2 + col * (cardW + gap);
+      const y = compact ? 285 + row * 220 : 380;
+      this.makeStageCard(x, y, cardW, st, cardH, compact);
     });
 
     // Disclaimer.
@@ -94,9 +102,8 @@ export default class MenuScene extends Phaser.Scene {
     }
   }
 
-  makeStageCard(x, y, w, st) {
+  makeStageCard(x, y, w, st, h = 260, compact = false) {
     const score = getScore(st.n);
-    const h = 260;
     const cont = this.add.container(x, y);
     const bg = this.add
       .rectangle(0, 0, w, h, COLORS.panel, 0.95)
@@ -108,7 +115,7 @@ export default class MenuScene extends Phaser.Scene {
       this.add
         .text(0, -h / 2 + 34, t("stage", { n: st.n }), {
           fontFamily: FONT,
-          fontSize: "20px",
+          fontSize: compact ? "18px" : "20px",
           color: "#d8a54a",
           fontStyle: "bold",
         })
@@ -118,7 +125,7 @@ export default class MenuScene extends Phaser.Scene {
       this.add
         .text(0, -h / 2 + 74, t(st.titleKey), {
           fontFamily: FONT,
-          fontSize: "23px",
+          fontSize: compact ? "20px" : "23px",
           color: "#f2ecd8",
           fontStyle: "bold",
           align: "center",
@@ -128,9 +135,9 @@ export default class MenuScene extends Phaser.Scene {
     );
     cont.add(
       this.add
-        .text(0, 24, t(st.blurbKey), {
+        .text(0, compact ? 12 : 24, t(st.blurbKey), {
           fontFamily: FONT,
-          fontSize: "16px",
+          fontSize: compact ? "14px" : "16px",
           color: "#c9b98f",
           align: "center",
           wordWrap: { width: w - 26 },
@@ -140,7 +147,7 @@ export default class MenuScene extends Phaser.Scene {
 
     cont.add(
       this.add
-        .text(0, h / 2 - 62, score ? t("best_score", { score }) : t("no_score"), {
+        .text(0, h / 2 - (compact ? 50 : 62), score ? t("best_score", { score }) : t("no_score"), {
           fontFamily: FONT,
           fontSize: "17px",
           color: score ? "#d8a54a" : "#9c8f68",
@@ -151,7 +158,7 @@ export default class MenuScene extends Phaser.Scene {
 
     cont.add(
       this.add
-        .text(0, h / 2 - 28, "▶ " + t("btn_begin"), {
+        .text(0, h / 2 - (compact ? 22 : 28), "▶ " + t("btn_begin"), {
           fontFamily: FONT,
           fontSize: "22px",
           color: "#6fbf5a",

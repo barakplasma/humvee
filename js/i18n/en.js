@@ -34,6 +34,10 @@ export const en = {
   stage4_blurb: "Slopes, side-slopes, traction loss and fording.",
   stage5_title: "Trailer Parking",
   stage5_blurb: "Reverse the water trailer into the bay.",
+  stage6_title: "Pre/Post Checks",
+  stage6_blurb: "Inspect tires, oil, fluids and leaks.",
+  stage7_title: "Gauge Scan",
+  stage7_blurb: "Learn what each instrument is telling you.",
   best_score: "Best: {score}",
   no_score: "No score yet",
   stage_locked_msg: "Finish the previous stage to unlock this one.",
@@ -46,7 +50,7 @@ export const en = {
   score: "Score: {score}",
   btn_next_stage: "Next Stage",
   all_complete_title: "Training Complete",
-  all_complete_msg: "You have completed all five stages. Outstanding.",
+  all_complete_msg: "You have completed all seven stages. Outstanding.",
 
   // ---- Controls (names + teaching text), used by Stage 1 tour ----
   ctrl_tour_intro:
@@ -161,4 +165,45 @@ export const en = {
   s5_jackknife: "Jackknifing! Pull forward (D) to straighten the trailer.",
   s5_inbay: "In the bay — straighten up and stop.",
   s5_parked: "Trailer parked in the perfect spot. Outstanding!",
+
+  // ---- Stage 6 pre/post driving checks ----
+  s6_obj: "Review each pre-drive and post-drive inspection item.",
+  s6_progress: "Inspection checks: {done} / {total}",
+  s6_tire_title: "Tire Pressure & Condition",
+  s6_tire_body:
+    "Before driving, check all tires for obvious low pressure, cuts, exposed cord, missing valve caps, and loose or missing lug nuts. Use the correct pressure from the vehicle data plate or unit SOP.",
+  s6_oil_title: "Engine Oil",
+  s6_oil_body:
+    "With the vehicle level and engine off, pull the dipstick, wipe it, reinsert, then read the level. Oil should be in range and not milky, gritty, or burnt-smelling.",
+  s6_fluids_title: "Fluid Levels",
+  s6_fluids_body:
+    "Check coolant, brake fluid, power steering fluid, and other visible reservoirs according to the operator checklist. Do not open a hot cooling system.",
+  s6_belts_title: "Belts, Hoses & Wiring",
+  s6_belts_body:
+    "Look for cracked belts, loose clamps, worn hoses, damaged wiring, or anything rubbing near moving parts. Small issues become breakdowns off-road.",
+  s6_post_leaks_title: "Post-Drive Leaks",
+  s6_post_leaks_body:
+    "After driving, look under the engine, transmission, transfer case, axles, and hubs for fresh leaks. New drips after a hard run matter.",
+  s6_post_tires_title: "Post-Drive Tires & Hubs",
+  s6_post_tires_body:
+    "After driving, recheck tire damage and feel near hubs cautiously for abnormal heat. Heat, smell, or fresh noise can point to brake or bearing trouble.",
+
+  // ---- Stage 7 gauges ----
+  s7_obj: "Tap every highlighted gauge and learn what to scan while driving.",
+  s7_progress: "Gauges reviewed: {done} / {total}",
+  s7_oil_title: "Oil Pressure",
+  s7_oil_body:
+    "Oil pressure confirms the engine is being lubricated. A sudden drop, flicker, or reading outside the normal range means stop safely and investigate.",
+  s7_temp_title: "Engine Temperature",
+  s7_temp_body:
+    "Temperature shows cooling-system health. Rising temperature under load means reduce strain, check airflow, coolant, fan belts, and leaks.",
+  s7_fuel_title: "Fuel Level",
+  s7_fuel_body:
+    "Fuel level is part of route planning. Off-road work and low range burn more fuel than steady road driving.",
+  s7_speed_title: "Speedometer / Odometer",
+  s7_speed_body:
+    "Speed helps you obey limits and choose the right gear range. The odometer supports fuel, maintenance, and mission tracking.",
+  s7_volt_title: "Voltmeter",
+  s7_volt_body:
+    "Voltage shows charging-system health. Low voltage can mean battery or alternator trouble; unusually high voltage can damage equipment.",
 };

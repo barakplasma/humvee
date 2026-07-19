@@ -53,7 +53,7 @@ assets/overrides.json    id -> image path map (the only art-wiring file)
 .github/workflows/deploy-pages.yml   GitHub Pages deploy
 ```
 
-## The five stages
+## The seven stages
 
 Stages unlock sequentially (complete N → unlock N+1), tracked in `progress.js`.
 Each stage ends by starting `StageCompleteScene` with `{ stage, score, nextScene }`.
@@ -79,6 +79,12 @@ Each stage ends by starting `StageCompleteScene` with `{ stage, score, nextScene
    (M149)**. Intro shows a real trailer photo + explains reverse steering. Park the
    trailer in a marked bay (aligned within 14°, stopped ~1s). Jackknife warning
    when articulation > ~77°.
+6. **Pre/Post Checks** (`Stage6Scene`) — photo-led inspection checklist. Covers
+   tire pressure/condition, engine oil, fluid reservoirs, belts/hoses/wiring, and
+   post-drive leak/tire/hub checks.
+7. **Gauge Scan** (`Stage7Scene`) — close-up gauge lesson. Tap oil pressure,
+   temperature, fuel, speed/odometer, and voltmeter hotspots to learn what each
+   reading means while driving.
 
 ### Trailer kinematics (Stage 5)
 Bicycle model + rear-hitch trailer. Tractor rear axle `P`, heading `th`; trailer
@@ -98,7 +104,8 @@ Steering input priority each frame: **keyboard > wheel drag > device tilt > cent
   makes headless testing possible).
 - Pedals are hold-to-apply (`throttle`/`brakeInput` ramp). Optional gear selectors
   (`selectors: true`) render the transmission (`P R N OD D 2 1`) + transfer
-  (`H HL N L`) columns and emit `onGear`/`onRange`.
+  (`H HL N L`) columns and emit `onGear`/`onRange`. Match the cockpit photos:
+  transfer case on the left, transmission on the right.
 - HUD (`setSpeedDisplay`) shows SPD/GEAR/RANGE.
 
 When embedding in a scrolling scene, set `dc.container.setScrollFactor(0)` so the
@@ -144,13 +151,19 @@ procedural fallback** (drawn in `BootScene.gen_*`). One manifest fetch, no 404 s
 - Real photos live in `assets/photos/`; AI alternates in `assets/ai/`. To change the
   art for an id, edit `assets/overrides.json` only. A real photo always wins because
   the JSON points at it.
-- Ids: `title_art`, `dashboard_panel`, `humvee_topdown`, `humvee_side`, `trail_bg`,
-  `trailer_photo`. Vehicle sprites + tiled trail stay procedural (clean transparency
-  / seamless tiling); title, cockpit, and trailer ship as real photos.
+- Ids include `title_art`, `dashboard_panel`, `trail_bg`, `trailer_photo`,
+  Stage 1 closeups (`closeup_steering`, `closeup_gauges`, `closeup_panel`,
+  `closeup_switch`, `closeup_shifters`), Stage 6 inspection photos
+  (`inspection_engine`, `inspection_tire`, `inspection_fluids`), and procedural
+  vehicle sprites (`humvee_topdown`, `humvee_side`).
+- Vehicle sprites stay procedural for clean transparency and orientation; title,
+  cockpit, trail, trailer, closeup, and inspection shots use cropped album photos.
 - `humvee_topdown` and the Stage 5 `trailer_top` are procedural top-down sprites
   (photos can't provide a top-down orientation).
 - **If you swap `dashboard_panel`**, re-tune Stage 1 hotspot coords in
   `js/data/controls.js` to the new framing (they are cover-fit dependent).
+  Prefer adding closeup photos to `Dialog.showCard({ imageKey })` over replacing the
+  overview map.
 
 ### Generating AI art (optional)
 Use OpenRouter with an image model. `google/gemini-2.5-flash-image` works with default

@@ -6,6 +6,8 @@ import Stage2Scene from "./scenes/Stage2Scene.js";
 import Stage3Scene from "./scenes/Stage3Scene.js";
 import Stage4Scene from "./scenes/Stage4Scene.js";
 import Stage5Scene from "./scenes/Stage5Scene.js";
+import Stage6Scene from "./scenes/Stage6Scene.js";
+import Stage7Scene from "./scenes/Stage7Scene.js";
 import StageCompleteScene from "./scenes/StageCompleteScene.js";
 
 export function createConfig() {
@@ -34,6 +36,8 @@ export function createConfig() {
       Stage3Scene,
       Stage4Scene,
       Stage5Scene,
+      Stage6Scene,
+      Stage7Scene,
       StageCompleteScene,
     ],
   };

@@ -16,6 +16,16 @@ const STARTUP_STEPS = [
   { key: "startup_step_drive", target: "trans" },
 ];
 
+const CLOSEUP_BY_CONTROL = {
+  steering: "closeup_steering",
+  gauges: "closeup_gauges",
+  lights: "closeup_panel",
+  ignition: "closeup_switch",
+  trans: "closeup_shifters",
+  transfer: "closeup_shifters",
+  pbrake: "closeup_shifters",
+};
+
 export default class Stage1Scene extends Phaser.Scene {
   constructor() {
     super("Stage1Scene");
@@ -157,6 +167,7 @@ export default class Stage1Scene extends Phaser.Scene {
       this.dialog.showCard({
         title: t(hs.control.nameKey),
         body: t(hs.control.descKey),
+        imageKey: CLOSEUP_BY_CONTROL[hs.control.id] ? assetKey(CLOSEUP_BY_CONTROL[hs.control.id]) : undefined,
         onClose: isLast ? () => this.startStartup() : undefined,
       });
       if (!hs.seen) {

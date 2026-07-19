@@ -15,7 +15,7 @@ export default class Dialog {
    * Modal teaching card with a title, body and a dismiss button.
    * Returns nothing; calls onClose when dismissed.
    */
-  showCard({ title, body, button, onClose }) {
+  showCard({ title, body, button, onClose, imageKey }) {
     const s = this.scene;
     const cont = s.add.container(0, 0).setDepth(2000).setScrollFactor(0);
 
@@ -25,8 +25,9 @@ export default class Dialog {
       .setInteractive();
     cont.add(overlay);
 
-    const cw = 720;
-    const ch = 360;
+    const hasImage = Boolean(imageKey);
+    const cw = hasImage ? 860 : 720;
+    const ch = hasImage ? 500 : 360;
     const cx = GAME_WIDTH / 2;
     const cy = GAME_HEIGHT / 2;
 
@@ -47,16 +48,30 @@ export default class Dialog {
       .setOrigin(0.5, 0);
     cont.add(titleText);
 
+    let bodyX = cx;
+    let bodyY = titleText.y + titleText.height + 24;
+    let bodyWidth = cw - 80;
+    if (hasImage) {
+      const photo = s.add.image(cx - 220, cy + 10, imageKey);
+      const maxW = 360;
+      const maxH = 250;
+      photo.setScale(Math.min(maxW / photo.width, maxH / photo.height));
+      cont.add(photo);
+      bodyX = cx + 190;
+      bodyY = cy - 160;
+      bodyWidth = 380;
+    }
+
     const bodyText = s.add
-      .text(cx, titleText.y + titleText.height + 24, body, {
+      .text(bodyX, bodyY, body, {
         fontFamily: FONT,
-        fontSize: "23px",
+        fontSize: hasImage ? "21px" : "23px",
         color: "#f2ecd8",
         align: this.align(),
         lineSpacing: 6,
-        wordWrap: { width: cw - 80 },
+        wordWrap: { width: bodyWidth },
       })
-      .setOrigin(0.5, 0);
+      .setOrigin(hasImage ? 0 : 0.5, 0);
     cont.add(bodyText);
 
     const btn = this.makeButton(cx, cy + ch / 2 - 44, button || t("btn_got_it"), () => {
