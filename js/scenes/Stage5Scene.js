@@ -26,6 +26,7 @@ export default class Stage5Scene extends Phaser.Scene {
     this.started = false;
     this.finished = false;
     this.parkTimer = 0;
+    this.reverseDistance = 0;
 
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H);
     this.add.rectangle(0, 0, WORLD_W, WORLD_H, 0x4a4d47, 1).setOrigin(0); // lot
@@ -214,18 +215,20 @@ export default class Stage5Scene extends Phaser.Scene {
     const dir = ["D", "OD", "2", "1"].includes(g) ? 1 : g === "R" ? -1 : 0;
     const maxF = 120;
     const maxR = 90;
+    const articulation = Math.abs(Phaser.Math.Angle.Wrap(this.th - this.ph));
+    const trailerLoad = 1 + articulation * 0.45;
 
     if (dir === 0) {
       this.v = toward(this.v, 0, 300 * dt);
     } else {
-      this.v += this.dc.throttle * 220 * dt * dir;
-      const fr = 120 * dt + this.dc.brakeInput * 520 * dt;
+      this.v += (this.dc.throttle * 220 * dt * dir) / trailerLoad;
+      const fr = (120 + articulation * 90) * dt + this.dc.brakeInput * 520 * dt;
       this.v = this.v > 0 ? Math.max(0, this.v - fr) : Math.min(0, this.v + fr);
       this.v = Phaser.Math.Clamp(this.v, -maxR, maxF);
     }
 
     // Bicycle steering of the tractor.
-    const steerAngle = this.dc.steer * 0.55;
+    const steerAngle = (this.dc.steer * 0.55) / (1 + articulation * 0.35);
     const thDot = (this.v / WHEELBASE) * Math.tan(steerAngle);
     this.th += thDot * dt;
 
@@ -239,6 +242,7 @@ export default class Stage5Scene extends Phaser.Scene {
     const diff = Phaser.Math.Angle.Wrap(this.th - this.ph);
     const phDot = (this.v / TLEN) * Math.sin(diff) - (HITCH / TLEN) * thDot * Math.cos(diff);
     this.ph += phDot * dt;
+    if (this.v < -4) this.reverseDistance += Math.abs(this.v) * dt;
 
     this.layout();
     this.dc.setSpeedDisplay(Math.abs(this.v) * 0.16);
@@ -267,10 +271,11 @@ export default class Stage5Scene extends Phaser.Scene {
     const off = Math.min(deg, 180 - deg);
     const aligned = off < 14;
     const stopped = Math.abs(this.v) < 4;
+    const reversedEnough = this.reverseDistance > 160;
 
     this.bayFill.setFillStyle(COLORS.good, inBay ? (aligned ? 0.4 : 0.2) : 0);
 
-    if (inBay && aligned && stopped) {
+    if (inBay && aligned && stopped && reversedEnough) {
       this.parkTimer += dt;
       if (!this._inbayShown) {
         this._inbayShown = true;
