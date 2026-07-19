@@ -43,6 +43,16 @@ export const he = {
   stage_locked_msg: "סיימו את השלב הקודם כדי לפתוח את זה.",
   progress_reset: "איפוס ניקוד",
   progress_reset_confirm: "לאפס את כל הניקוד?",
+  credits_title: "קרדיטים",
+  credits_body:
+    "מאמן נהיגה להאמר A2 הוא משחק לימודי עצמאי מאת ברק פלזמה. המשחק משתמש ב-Phaser 4 ובתמונות ייחוס אמיתיות כשיש.",
+  credits_contrib:
+    "דיווחי באגים ותיקונים יתקבלו בברכה, במיוחד תיקוני תוכן על תפעול הרכב, בקרות, מחוונים, בדיקות ופיזיקת נהיגה.",
+  credits_repo: "קוד מקור",
+  credits_issues: "דיווח בעיות",
+  credits_profile: "פרופיל GitHub",
+  credits_license:
+    "כל הזכויות שמורות. תרומות יתקבלו דרך מאגר GitHub; צרו קשר דרך LinkedIn מפרופיל GitHub.",
 
   // ---- Stage complete ----
   stage_complete: "השלב הושלם!",

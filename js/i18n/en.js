@@ -43,6 +43,16 @@ export const en = {
   stage_locked_msg: "Finish the previous stage to unlock this one.",
   progress_reset: "Reset scores",
   progress_reset_confirm: "Reset all scores?",
+  credits_title: "Credits",
+  credits_body:
+    "Humvee A2 Driver Trainer is an independent educational game by Barak Plasma. It uses Phaser 4 and real reference photos where available.",
+  credits_contrib:
+    "Bug reports and fixes are welcome, especially corrections to the vehicle-operation content, controls, gauges, inspection steps, and driving physics.",
+  credits_repo: "Source code",
+  credits_issues: "Report issues",
+  credits_profile: "GitHub profile",
+  credits_license:
+    "All rights reserved. Contributions are welcome through the GitHub repository; contact via LinkedIn from the GitHub profile.",
 
   // ---- Stage complete ----
   stage_complete: "Stage Complete!",

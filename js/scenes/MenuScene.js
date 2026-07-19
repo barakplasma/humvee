@@ -97,6 +97,18 @@ export default class MenuScene extends Phaser.Scene {
 
     addFullscreenButton(this, GAME_WIDTH - 24, 58);
 
+    const creditsBtn = this.add
+      .text(GAME_WIDTH - 24, 92, t("credits_title"), {
+        fontFamily: FONT,
+        fontSize: "18px",
+        color: "#f2ecd8",
+        backgroundColor: "rgba(0,0,0,0.35)",
+        padding: { x: 10, y: 5 },
+      })
+      .setOrigin(1, 0.5)
+      .setInteractive({ useHandCursor: true });
+    creditsBtn.on("pointerup", () => this.scene.start("CreditsScene"));
+
     if (allComplete()) {
       this.dialog.toast(t("all_complete_msg"), { color: "#6fbf5a", duration: 3000 });
     }

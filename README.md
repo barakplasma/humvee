@@ -1,11 +1,13 @@
 # Humvee A2 Driver Trainer
 
-A simple, mobile-first educational game (built for **Android Chrome**, works on any modern
-browser) that teaches how to operate a **US military HMMWV "Humvee" A2**. Built with
-[Phaser 4](https://phaser.io/) — no build step, just static files.
+Humvee A2 Driver Trainer is a mobile-first educational game for learning the basics of a
+US military HMMWV "Humvee" A2. It runs in a modern browser, is built with
+[Phaser 4](https://phaser.io/), and ships as static files with no build step.
 
-> ⚠️ **Training aid, not an operator's manual.** This game is a simplified educational
-> simulation. It is **not** an authoritative source. The real reference is the operator's
+Hebrew is the default language. English is also available from the title screen.
+
+> **Training aid, not an operator's manual.** This game is a simplified educational
+> simulation. It is not an authoritative source. The real reference is the operator's
 > technical manual **TM 9-2320-280-10**. Always follow official training and supervision
 > before operating any actual vehicle.
 
@@ -21,6 +23,10 @@ browser) that teaches how to operate a **US military HMMWV "Humvee" A2**. Built 
    fording, using the techniques from Stage 3.
 5. **Trailer Parking** — hitch up and reverse an M149 water trailer into a marked
    bay (articulated trailer physics; reverse steering is inverted).
+6. **Pre/Post Checks** — inspect tires, oil, fluids, belts, hoses, wiring, leaks, and
+   post-drive tire/hub condition.
+7. **Gauge Scan** — answer quiz questions about oil pressure, temperature, fuel,
+   speed/odometer, and voltage readings.
 
 ## Controls
 
@@ -32,9 +38,32 @@ fullscreen in landscape.
 
 ## Languages
 
-English and Hebrew (עברית), with right-to-left support. Use the language toggle on the
-title screen. To add a language, copy `js/i18n/en.js` to `js/i18n/<code>.js`, translate the
-values, and register it in `js/i18n/i18n.js`.
+Hebrew (עברית) and English are supported, with right-to-left rendering for Hebrew.
+The game defaults to Hebrew unless the player has saved another preference. To add a
+language, copy `js/i18n/en.js` to `js/i18n/<code>.js`, translate the values, and register
+it in `js/i18n/i18n.js`.
+
+## Credits and contact
+
+- Source code: <https://github.com/barakplasma/humvee>
+- Author: Barak Plasma, <https://github.com/barakplasma>
+- Contact: use LinkedIn from the GitHub profile.
+
+The in-game credits page links to the repository, issue tracker, and GitHub profile.
+
+## Contributing
+
+Bug reports and fixes are welcome. Content corrections are especially valuable: vehicle
+controls, gauges, pre/post driving checks, transfer-case and transmission behavior,
+trailer handling, and top-down driving physics should be reported when they are wrong or
+misleading.
+
+Use GitHub Issues for bugs and content problems:
+
+    https://github.com/barakplasma/humvee/issues
+
+Pull requests are welcome for fixes. By contributing, you agree to the contribution terms
+in [`LICENSE`](LICENSE).
 
 ## Run locally
 
@@ -106,3 +135,9 @@ seamless tiling); the title and cockpit ship as AI images.
 - Progress and language are saved in `localStorage`.
 - `Phaser.Scale.FIT` keeps a 1280×720 design landscape and scales to the device; a
   rotate-to-landscape hint appears on portrait phones.
+
+## License
+
+All rights reserved. Contributions are accepted under the inbound contribution terms in
+[`LICENSE`](LICENSE), but the project is not open-source licensed for reuse,
+redistribution, hosting, or derivative works without separate permission.
