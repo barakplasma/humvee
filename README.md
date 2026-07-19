@@ -57,12 +57,18 @@ So the game runs fully even with no image files present. Override images are lis
 
 ```json
 {
-  "title_art": "assets/ai/title_art.jpg",
-  "dashboard_panel": "assets/ai/dashboard_panel.jpg"
+  "title_art": "assets/photos/title_art.jpg",
+  "dashboard_panel": "assets/photos/dashboard_panel.jpg"
 }
 ```
 
-The AI images (generated with Google Gemini image via OpenRouter) live in `assets/ai/`.
+The title and cockpit ship as **real museum photos** of an HMMWV in `assets/photos/`.
+AI-generated alternates (Google Gemini image via OpenRouter) remain in `assets/ai/` and
+can be swapped back in by re-pointing the ids above.
+
+> Note: the Stage 1 hotspot positions in `js/data/controls.js` are tuned to the shipped
+> `dashboard_panel` cockpit photo. If you replace it with a differently-framed photo,
+> nudge those coordinates to match.
 
 ### Replacing an AI image with a real museum photo
 
