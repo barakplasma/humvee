@@ -8,3 +8,6 @@ Thumbs.db
 # Node (not used at runtime, but just in case)
 node_modules/
 npm-debug.log*
+
+# Raw Google Photos album dump; curated assets live in tracked paths above.
+assets/photos/_album_raw/

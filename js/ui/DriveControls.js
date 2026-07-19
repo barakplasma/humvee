@@ -2,6 +2,23 @@ import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONT } from "../theme.js";
 import { t } from "../i18n/i18n.js";
 import { TRANSMISSION, TRANSFER } from "../data/controls.js";
 
+const GEAR_SPEC = {
+  OD: { drive: 1, torque: 0.72, max: 520, idle: 670, redline: 3300 },
+  D: { drive: 1, torque: 1, max: 430, idle: 700, redline: 3600 },
+  "2": { drive: 1, torque: 1.45, max: 270, idle: 760, redline: 3800 },
+  "1": { drive: 1, torque: 2.15, max: 175, idle: 820, redline: 3900 },
+  R: { drive: -1, torque: 1.75, max: 145, idle: 780, redline: 3400 },
+  N: { drive: 0, torque: 0, max: 0, idle: 650, redline: 1500 },
+  P: { drive: 0, torque: 0, max: 0, idle: 650, redline: 1200 },
+};
+
+const RANGE_SPEC = {
+  H: { torque: 1, speed: 1 },
+  HL: { torque: 1.08, speed: 0.92 },
+  L: { torque: 2.55, speed: 0.42 },
+  N: { torque: 0, speed: 0 },
+};
+
 /**
  * On-screen driving controls: a steering wheel (drag or arrow keys), gas/brake
  * pedals, optional transmission + transfer-case selectors, and a HUD readout.
@@ -333,7 +350,9 @@ export default class DriveControls {
   }
 
   setSpeedDisplay(kph) {
+    const rpm = arguments.length > 1 ? arguments[1] : null;
     const parts = [`${t("hud_speed")} ${Math.round(kph)}`];
+    if (rpm !== null) parts.push(`${t("hud_rpm")} ${Math.round(rpm)}`);
     if (this.opts.selectors) {
       parts.push(`${t("hud_gear")} ${this.gear}`);
       parts.push(`${t("hud_range")} ${this.range}`);
@@ -341,6 +360,31 @@ export default class DriveControls {
       parts.push(`${t("hud_gear")} ${this.gear}`);
     }
     if (this.hud) this.hud.setText(parts.join("    "));
+  }
+
+  getDriveSpec({ load = 1, terrainDrag = 0 } = {}) {
+    const gear = GEAR_SPEC[this.gear] || GEAR_SPEC.N;
+    const range = RANGE_SPEC[this.range] || RANGE_SPEC.H;
+    const maxSpeed = gear.max * range.speed;
+    return {
+      dir: gear.drive,
+      maxSpeed,
+      torque: gear.torque * range.torque / Math.max(0.25, load),
+      rollingDrag: 115 + terrainDrag + (this.range === "L" ? 28 : 0) + (this.range === "HL" ? 14 : 0),
+      brakeDrag: 680,
+      idleRpm: gear.idle,
+      redlineRpm: gear.redline,
+    };
+  }
+
+  getRpm(speed, { load = 0 } = {}) {
+    const gear = GEAR_SPEC[this.gear] || GEAR_SPEC.N;
+    const range = RANGE_SPEC[this.range] || RANGE_SPEC.H;
+    if (gear.drive === 0 || range.speed === 0) return gear.idle + this.throttle * (gear.redline - gear.idle) * 0.35;
+    const gearRatio = Math.max(0.12, gear.max * range.speed);
+    const speedShare = Phaser.Math.Clamp(Math.abs(speed) / gearRatio, 0, 1.25);
+    const throttleLoad = this.throttle * (0.18 + load * 0.22);
+    return Phaser.Math.Clamp(gear.idle + (gear.redline - gear.idle) * (speedShare + throttleLoad), gear.idle, gear.redline);
   }
 
   // ---- Keyboard (desktop + automated tests) ----

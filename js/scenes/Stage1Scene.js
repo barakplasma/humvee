@@ -305,7 +305,7 @@ export default class Stage1Scene extends Phaser.Scene {
     this.refreshChecklist();
     this.dialog.toast(t("startup_done"), { color: "#6fbf5a", duration: 2200 });
     this.time.delayedCall(1800, () =>
-      this.scene.start("StageCompleteScene", { stage: 1, score: 100, nextScene: "Stage2Scene" })
+      this.scene.start("StageCompleteScene", { stage: 1, score: 100, nextScene: "StageGearScene" })
     );
   }
 }

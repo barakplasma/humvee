@@ -93,5 +93,5 @@ export const CONTROLS = [
 // Transmission selector positions (order matters for the on-screen selector).
 export const TRANSMISSION = ["P", "R", "N", "OD", "D", "2", "1"];
 
-// Transfer-case range positions.
-export const TRANSFER = ["H", "HL", "N", "L"];
+// Transfer-case range positions, matching the physical lever order.
+export const TRANSFER = ["HL", "H", "N", "L"];

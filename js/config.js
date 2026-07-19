@@ -3,6 +3,8 @@ import BootScene from "./scenes/BootScene.js";
 import AboutScene from "./scenes/AboutScene.js";
 import MenuScene from "./scenes/MenuScene.js";
 import Stage1Scene from "./scenes/Stage1Scene.js";
+import StageGearScene from "./scenes/StageGearScene.js";
+import StageObstacleScene from "./scenes/StageObstacleScene.js";
 import Stage2Scene from "./scenes/Stage2Scene.js";
 import Stage3Scene from "./scenes/Stage3Scene.js";
 import Stage4Scene from "./scenes/Stage4Scene.js";
@@ -36,6 +38,8 @@ export function createConfig() {
       AboutScene,
       MenuScene,
       Stage1Scene,
+      StageGearScene,
+      StageObstacleScene,
       Stage2Scene,
       Stage3Scene,
       Stage4Scene,

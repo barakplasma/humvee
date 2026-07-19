@@ -217,14 +217,15 @@ export default class Stage5Scene extends Phaser.Scene {
     const maxR = 90;
     const articulation = Math.abs(Phaser.Math.Angle.Wrap(this.th - this.ph));
     const trailerLoad = 1 + articulation * 0.45;
+    const drive = this.dc.getDriveSpec({ load: trailerLoad, terrainDrag: 80 });
 
     if (dir === 0) {
       this.v = toward(this.v, 0, 300 * dt);
     } else {
-      this.v += (this.dc.throttle * 220 * dt * dir) / trailerLoad;
-      const fr = (120 + articulation * 90) * dt + this.dc.brakeInput * 520 * dt;
+      this.v += this.dc.throttle * 180 * drive.torque * dt * dir;
+      const fr = (drive.rollingDrag + articulation * 90) * dt + this.dc.brakeInput * drive.brakeDrag * dt;
       this.v = this.v > 0 ? Math.max(0, this.v - fr) : Math.min(0, this.v + fr);
-      this.v = Phaser.Math.Clamp(this.v, -maxR, maxF);
+      this.v = Phaser.Math.Clamp(this.v, -Math.min(maxR, drive.maxSpeed), Math.min(maxF, drive.maxSpeed));
     }
 
     // Bicycle steering of the tractor.
@@ -245,7 +246,7 @@ export default class Stage5Scene extends Phaser.Scene {
     if (this.v < -4) this.reverseDistance += Math.abs(this.v) * dt;
 
     this.layout();
-    this.dc.setSpeedDisplay(Math.abs(this.v) * 0.16);
+    this.dc.setSpeedDisplay(Math.abs(this.v) * 0.16, this.dc.getRpm(this.v, { load: 0.7 + articulation * 0.4 }));
 
     this.checkJackknife(diff);
     this.checkParked(dt);
@@ -297,7 +298,7 @@ export default class Stage5Scene extends Phaser.Scene {
     this.finished = true;
     this.dialog.toast(t("s5_parked"), { color: "#6fbf5a", duration: 2200 });
     this.time.delayedCall(1800, () =>
-      this.scene.start("StageCompleteScene", { stage: 5, score: 100, nextScene: "Stage6Scene" })
+      this.scene.start("StageCompleteScene", { stage: 7, score: 100, nextScene: "Stage6Scene" })
     );
   }
 }

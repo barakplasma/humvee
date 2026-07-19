@@ -8,13 +8,15 @@ import { addFullscreenButton } from "../ui/fullscreen.js";
 
 const STAGES = [
   { n: 1, titleKey: "stage1_title", blurbKey: "stage1_blurb", scene: "Stage1Scene" },
-  { n: 2, titleKey: "stage2_title", blurbKey: "stage2_blurb", scene: "Stage2Scene" },
-  { n: 3, titleKey: "stage3_title", blurbKey: "stage3_blurb", scene: "Stage3Scene" },
-  { n: 4, titleKey: "stage4_title", blurbKey: "stage4_blurb", scene: "Stage4Scene" },
-  { n: 5, titleKey: "stage5_title", blurbKey: "stage5_blurb", scene: "Stage5Scene" },
-  { n: 6, titleKey: "stage6_title", blurbKey: "stage6_blurb", scene: "Stage6Scene" },
-  { n: 7, titleKey: "stage7_title", blurbKey: "stage7_blurb", scene: "Stage7Scene" },
-  { n: 8, titleKey: "stage8_title", blurbKey: "stage8_blurb", scene: "Stage8Scene" },
+  { n: 2, titleKey: "stage2_title", blurbKey: "stage2_blurb", scene: "StageGearScene" },
+  { n: 3, titleKey: "stage3_title", blurbKey: "stage3_blurb", scene: "StageObstacleScene" },
+  { n: 4, titleKey: "stage4_title", blurbKey: "stage4_blurb", scene: "Stage2Scene" },
+  { n: 5, titleKey: "stage5_title", blurbKey: "stage5_blurb", scene: "Stage3Scene" },
+  { n: 6, titleKey: "stage6_title", blurbKey: "stage6_blurb", scene: "Stage4Scene" },
+  { n: 7, titleKey: "stage7_title", blurbKey: "stage7_blurb", scene: "Stage5Scene" },
+  { n: 8, titleKey: "stage8_title", blurbKey: "stage8_blurb", scene: "Stage6Scene" },
+  { n: 9, titleKey: "stage9_title", blurbKey: "stage9_blurb", scene: "Stage7Scene" },
+  { n: 10, titleKey: "stage10_title", blurbKey: "stage10_blurb", scene: "Stage8Scene" },
 ];
 
 export default class MenuScene extends Phaser.Scene {

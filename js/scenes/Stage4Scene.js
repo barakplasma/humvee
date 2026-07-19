@@ -68,6 +68,7 @@ export default class Stage4Scene extends Phaser.Scene {
     this.dc = new DriveControls(this, { selectors: true, gear: "D", range: "H" });
     this.dc.container.setScrollFactor(0);
 
+    this.buildSideSlopeCamera();
     this.buildIndicators();
     this.banner = this.dialog.banner(t("s4_obj"));
     this.makeBackButton();
@@ -149,6 +150,118 @@ export default class Stage4Scene extends Phaser.Scene {
       .setDepth(1400);
   }
 
+  buildSideSlopeCamera() {
+    this.sideCam = this.add.container(0, 0).setScrollFactor(0).setDepth(420).setVisible(false).setAlpha(0);
+    this.sideCamBg = this.add.graphics();
+    this.sideCamTrail = this.add.graphics();
+    this.sideCamTruck = this.add.container(0, 0);
+    this.sideCamTruckBody = this.add.graphics();
+    this.sideCamTruck.add(this.sideCamTruckBody);
+
+    this.sideCamLabel = this.add
+      .text(GAME_WIDTH / 2, 128, t("s4_rear_camera"), {
+        fontFamily: FONT,
+        fontSize: "23px",
+        color: "#f2ecd8",
+        fontStyle: "bold",
+        align: "center",
+        backgroundColor: "rgba(28,33,20,0.72)",
+        padding: { x: 14, y: 7 },
+        wordWrap: { width: 650 },
+      })
+      .setOrigin(0.5, 0);
+
+    this.sideCam.add([this.sideCamBg, this.sideCamTrail, this.sideCamTruck, this.sideCamLabel]);
+    this.drawRearTruck();
+  }
+
+  setSideSlopeCamera(active) {
+    if (active === this.sideCamActive) return;
+    this.sideCamActive = active;
+    this.vehicle.setVisible(!active);
+    this.sideCam.setVisible(true);
+    this.tweens.killTweensOf(this.sideCam);
+    this.tweens.add({
+      targets: this.sideCam,
+      alpha: active ? 1 : 0,
+      duration: 180,
+      onComplete: () => {
+        if (!active) this.sideCam.setVisible(false);
+      },
+    });
+  }
+
+  updateSideSlopeCamera(zone, roll) {
+    const progress = zone ? Phaser.Math.Clamp((this.carX - zone.x0) / (zone.x1 - zone.x0), 0, 1) : 0;
+    const slopeAngle = -0.28;
+    const dangerLean = Phaser.Math.Clamp(roll, 0, 1) * -0.2;
+    const truckAngle = slopeAngle + dangerLean;
+    const cx = GAME_WIDTH / 2;
+    const baseY = 535;
+
+    const bg = this.sideCamBg;
+    bg.clear();
+    bg.fillGradientStyle(0x98b7c9, 0x98b7c9, 0xd9c28c, 0xb59b68, 1);
+    bg.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    bg.fillStyle(0x5f6f3a, 1);
+    bg.beginPath();
+    bg.moveTo(0, 640);
+    bg.lineTo(0, 456);
+    bg.lineTo(GAME_WIDTH, 205);
+    bg.lineTo(GAME_WIDTH, GAME_HEIGHT);
+    bg.lineTo(0, GAME_HEIGHT);
+    bg.closePath();
+    bg.fillPath();
+
+    const trail = this.sideCamTrail;
+    trail.clear();
+    trail.lineStyle(7, 0x3c3020, 0.55);
+    for (let i = 0; i < 7; i++) {
+      const y = 265 + i * 58 + progress * 28;
+      trail.beginPath();
+      trail.moveTo(cx - 500 + i * 42, y + 108);
+      trail.lineTo(cx - 74, baseY - 22);
+      trail.lineTo(cx + 74, baseY - 58);
+      trail.lineTo(cx + 510 - i * 42, y - 126);
+      trail.strokePath();
+    }
+    trail.lineStyle(5, 0xf2ecd8, 0.55);
+    trail.lineBetween(cx - 440, baseY + 80, cx + 445, baseY - 165);
+    trail.lineStyle(5, roll > 0.8 ? COLORS.bad : COLORS.accent, 0.95);
+    trail.lineBetween(cx - 80, baseY - 24, cx + 80, baseY - 68);
+
+    this.sideCamTruck.setPosition(cx, baseY - 54);
+    this.sideCamTruck.setRotation(truckAngle);
+  }
+
+  drawRearTruck() {
+    const truck = this.sideCamTruckBody;
+    truck.clear();
+    truck.fillStyle(0x1a2114, 0.5);
+    truck.fillEllipse(0, 86, 350, 44);
+    truck.fillStyle(COLORS.armyGreenDark, 1);
+    truck.fillRoundedRect(-190, -95, 380, 128, 12);
+    truck.fillStyle(COLORS.armyGreen, 1);
+    truck.fillRoundedRect(-152, -156, 304, 86, 10);
+    truck.lineStyle(5, 0x14180f, 1);
+    truck.strokeRoundedRect(-190, -95, 380, 128, 12);
+    truck.strokeRoundedRect(-152, -156, 304, 86, 10);
+    truck.fillStyle(0x192026, 1);
+    truck.fillRoundedRect(-130, -140, 92, 54, 5);
+    truck.fillRoundedRect(38, -140, 92, 54, 5);
+    truck.fillStyle(0x0d0f0c, 1);
+    truck.fillCircle(-142, 54, 52);
+    truck.fillCircle(142, 54, 52);
+    truck.fillStyle(0x32382b, 1);
+    truck.fillCircle(-142, 54, 28);
+    truck.fillCircle(142, 54, 28);
+    truck.fillStyle(0xa58b4d, 1);
+    truck.fillCircle(-118, -24, 14);
+    truck.fillCircle(118, -24, 14);
+    truck.lineStyle(6, COLORS.accent, 1);
+    truck.lineBetween(-180, 88, 180, 88);
+  }
+
   makeBackButton() {
     const b = this.add
       .text(this.scale.width - 24, 20, "‹ " + t("btn_menu"), {
@@ -187,7 +300,7 @@ export default class Stage4Scene extends Phaser.Scene {
     const reverse = this.dc.gear === "R";
     const dir = forward ? 1 : reverse ? -1 : 0;
     let torque =
-      (this.dc.range === "L" ? 1.6 : 1) *
+      (this.dc.range === "L" ? 2.35 : this.dc.range === "HL" ? 1.08 : 1) *
       ({ "1": 1.4, "2": 1.1, D: 1, OD: 0.8, R: 1 }[this.dc.gear] || 0);
     // A steep climb needs low range for real torque.
     if (zone && zone.type === "climb" && this.dc.range !== "L") torque *= 0.32;
@@ -224,7 +337,7 @@ export default class Stage4Scene extends Phaser.Scene {
 
     this.updateIndicators(slope, zone);
     this.handleZone(zone, dt);
-    this.dc.setSpeedDisplay(Math.abs(this.speed) * 0.14);
+    this.dc.setSpeedDisplay(Math.abs(this.speed) * 0.14, this.dc.getRpm(this.speed, { load: zone ? 0.55 : 0.2 }));
 
     if (this.carX >= this.finishX) this.finish();
   }
@@ -236,6 +349,8 @@ export default class Stage4Scene extends Phaser.Scene {
     // Roll rises with speed in the side-slope zone.
     let roll = 0;
     if (zone && zone.type === "sideslope") roll = Phaser.Math.Clamp(Math.abs(this.speed) / 230, 0, 1.2);
+    this.setSideSlopeCamera(Boolean(zone && zone.type === "sideslope"));
+    if (zone && zone.type === "sideslope") this.updateSideSlopeCamera(zone, roll);
     const w = Phaser.Math.Clamp(roll, 0, 1) * 210;
     this.rollBar.width = Math.max(4, w);
     this.rollBar.fillColor = roll > 0.8 ? COLORS.bad : roll > 0.5 ? COLORS.accent : COLORS.good;
@@ -288,7 +403,7 @@ export default class Stage4Scene extends Phaser.Scene {
     this.dialog.toast(t("s4_complete"), { color: "#6fbf5a", duration: 2000 });
     const score = Math.max(0, 100 - this.penalty);
     this.time.delayedCall(1600, () =>
-      this.scene.start("StageCompleteScene", { stage: 4, score, nextScene: "Stage5Scene" })
+      this.scene.start("StageCompleteScene", { stage: 6, score, nextScene: "Stage5Scene" })
     );
   }
 }

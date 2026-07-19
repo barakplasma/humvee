@@ -156,18 +156,17 @@ export default class Stage3Scene extends Phaser.Scene {
     const reverse = this.dc.gear === "R";
     const dir = forward ? 1 : reverse ? -1 : 0;
 
-    const gearMax = { D: 300, OD: 340, "2": 210, "1": 150, R: 120 }[this.dc.gear] || 0;
-    const rangeFactor = this.dc.range === "L" ? 0.6 : 1;
-    const maxSpeed = gearMax * rangeFactor;
+    const onTrail = this.onTrail(this.vehicle.x);
+    const drive = this.dc.getDriveSpec({ terrainDrag: onTrail ? 0 : 170 });
+    const maxSpeed = onTrail ? drive.maxSpeed : Math.min(90, drive.maxSpeed);
 
     if (dir === 0) {
-      this.speed -= 500 * dt;
+      this.speed = toward(this.speed, 0, (drive.rollingDrag + this.dc.brakeInput * drive.brakeDrag) * dt);
     } else {
-      this.speed += this.dc.throttle * 320 * dt;
-      this.speed -= 120 * dt; // rolling resistance
-      this.speed -= this.dc.brakeInput * 600 * dt;
+      this.speed += this.dc.throttle * 330 * drive.torque * dt;
+      this.speed = toward(this.speed, 0, drive.rollingDrag * dt);
+      this.speed = toward(this.speed, 0, this.dc.brakeInput * drive.brakeDrag * dt);
     }
-    const onTrail = this.onTrail(this.vehicle.x);
     this.speed = Phaser.Math.Clamp(this.speed, 0, onTrail ? maxSpeed : 90);
 
     // Kinematic bicycle steering. Direction comes from the transmission, but
@@ -195,7 +194,7 @@ export default class Stage3Scene extends Phaser.Scene {
     this.vehicle.x = Phaser.Math.Clamp(nx, TRAIL_X - TRAIL_HALF, TRAIL_X + TRAIL_HALF);
     this.vehicle.y = Phaser.Math.Clamp(ny, 100, 2500);
 
-    this.dc.setSpeedDisplay(this.speed * 0.12);
+    this.dc.setSpeedDisplay(this.speed * 0.12, this.dc.getRpm(this.speed, { load: onTrail ? 0.25 : 0.65 }));
     this.drawGates();
     this.checkFinish();
   }
@@ -239,7 +238,7 @@ export default class Stage3Scene extends Phaser.Scene {
       this.dialog.toast(t("s3_section_done"), { color: "#6fbf5a", duration: 1600 });
       const score = Math.max(0, 100 - this.wrong * 10);
       this.time.delayedCall(1400, () =>
-        this.scene.start("StageCompleteScene", { stage: 3, score, nextScene: "Stage4Scene" })
+        this.scene.start("StageCompleteScene", { stage: 5, score, nextScene: "Stage4Scene" })
       );
     }
   }

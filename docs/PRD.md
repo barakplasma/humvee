@@ -24,20 +24,26 @@ perform basic checks before and after driving.
 
 ## Current Experience
 
-The game has eight stages:
+The game has ten stages:
 
 1. Driver Controls: dashboard overview with hotspot lessons and closeup photos, then
    a guided startup checklist.
-2. City Driving: road discipline, red light, stop sign, and destination driving.
-3. Off-Road & Gears: transfer-case and transmission choices for terrain gates,
+2. Transmission & T-Case: focused shifter-layout lesson, with transfer case on the
+   left in physical order `HL / H / N / L` and transmission on the right.
+3. Obstacle Judgment: randomized passable/impassable quiz for grade, side-slope,
+   vertical step, trench width, and tree/log height.
+4. City Driving: road discipline, red light, stop sign, reverse, curved roads, and
+   destination driving.
+5. Off-Road & Gears: transfer-case and transmission choices for terrain gates,
    including stopped/neutral transfer-case range changes.
-4. Technical Off-Road: side-view slope, descent, traction, rollover, and water hazards.
-5. Trailer Parking: articulated M149-style trailer reversing and parking.
-6. Pre/Post Checks: tire pressure/condition, oil, fluids, belts/hoses/wiring, air
+6. Technical Off-Road: slope, descent, traction, rollover, side-slope rear/isometric
+   view, and water hazards.
+7. Trailer Parking: articulated M149-style trailer reversing and parking.
+8. Pre/Post Checks: tire pressure/condition, oil, fluids, belts/hoses/wiring, air
    restriction, leaks, tires, and hubs.
-7. Gauge Scan: oil pressure, temperature, fuel, speed/odometer, and voltmeter
+9. Gauge Scan: oil pressure, temperature, fuel, speed/odometer, and voltmeter
    multiple-choice quiz.
-8. Humvee Trivia: high-level history and specification quiz based on the English and
+10. Humvee Trivia: high-level history and specification quiz based on the English and
    Hebrew Wikipedia pages for Humvee.
 
 All stages are directly selectable from the menu. Best score is tracked per stage in
@@ -66,6 +72,9 @@ localStorage.
 - Gas and brake are hold-to-apply pedals with ramped values.
 - Gear selectors must match the cockpit photo: transfer case on the left, transmission
   on the right.
+- Transfer-case selector order must match the physical lever: `HL`, `H`, `N`, `L`.
+- Driving stages with gas must show RPM and make gear/range changes strongly affect
+  acceleration, engine load, and speed ceiling.
 - Fullscreen must only be triggered from pointer gestures.
 
 ## Driving Physics Guidelines

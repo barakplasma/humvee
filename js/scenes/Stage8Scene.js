@@ -175,7 +175,7 @@ export default class Stage8Scene extends Phaser.Scene {
     this.index++;
     if (this.index >= QUESTIONS.length) {
       const score = Math.max(0, Math.round((this.correct / QUESTIONS.length) * 100) - this.mistakes * 5);
-      this.scene.start("StageCompleteScene", { stage: 8, score, nextScene: null });
+      this.scene.start("StageCompleteScene", { stage: 10, score, nextScene: null });
       return;
     }
     this.renderQuestion();

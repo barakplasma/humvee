@@ -34,7 +34,7 @@ export default class Stage6Scene extends Phaser.Scene {
     addFullscreenButton(this, GAME_WIDTH - 132, 20);
 
     this.add
-      .text(GAME_WIDTH / 2, 86, t("stage6_title"), {
+      .text(GAME_WIDTH / 2, 86, t("stage8_title"), {
         fontFamily: FONT,
         fontSize: "38px",
         color: "#d8a54a",
@@ -126,7 +126,7 @@ export default class Stage6Scene extends Phaser.Scene {
 
   finish() {
     this.time.delayedCall(900, () =>
-      this.scene.start("StageCompleteScene", { stage: 6, score: 100, nextScene: "Stage7Scene" })
+      this.scene.start("StageCompleteScene", { stage: 8, score: 100, nextScene: "Stage7Scene" })
     );
   }
 }

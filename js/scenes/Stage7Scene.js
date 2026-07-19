@@ -80,7 +80,7 @@ export default class Stage7Scene extends Phaser.Scene {
     this.photo = this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2 + 22, assetKey("closeup_gauges"));
     this.photo.setScale(Math.min(980 / this.photo.width, 570 / this.photo.height));
     this.add
-      .text(GAME_WIDTH / 2, 66, t("stage7_title"), {
+      .text(GAME_WIDTH / 2, 66, t("stage9_title"), {
         fontFamily: FONT,
         fontSize: "38px",
         color: "#d8a54a",
@@ -201,7 +201,7 @@ export default class Stage7Scene extends Phaser.Scene {
   finish() {
     const score = Math.max(0, 100 - this.mistakes * 10);
     this.time.delayedCall(900, () =>
-      this.scene.start("StageCompleteScene", { stage: 7, score, nextScene: "Stage8Scene" })
+      this.scene.start("StageCompleteScene", { stage: 9, score, nextScene: "Stage8Scene" })
     );
   }
 }

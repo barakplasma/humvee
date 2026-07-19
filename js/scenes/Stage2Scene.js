@@ -9,11 +9,20 @@ const WORLD_W = 2000;
 const WORLD_H = 1500;
 const WHEELBASE = 115;
 const MAX_STEER_ANGLE = 0.48;
+const ROAD_HALF = 96;
 
-// Road segments (axis-aligned rectangles) forming an "L": up, then right.
-const ROADS = [
-  { x: 300, y: 150, w: 200, h: 1200 }, // vertical
-  { x: 300, y: 150, w: 1450, h: 200 }, // horizontal
+// Curved road centerline. The course still teaches a red light and stop sign,
+// but avoids the old right-angle geometry.
+const ROAD_PATH = [
+  [410, 1260],
+  [390, 1040],
+  [420, 830],
+  [510, 640],
+  [650, 500],
+  [830, 390],
+  [1060, 310],
+  [1320, 262],
+  [1640, 250],
 ];
 
 export default class Stage2Scene extends Phaser.Scene {
@@ -25,6 +34,7 @@ export default class Stage2Scene extends Phaser.Scene {
     this.dialog = new Dialog(this);
     this.penalty = 0;
     this.finished = false;
+    this.offroadTimer = 0;
 
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H);
     this.add.rectangle(0, 0, WORLD_W, WORLD_H, 0x5b6b3a, 1).setOrigin(0); // grass
@@ -33,14 +43,14 @@ export default class Stage2Scene extends Phaser.Scene {
     this.decorate();
 
     // Traffic light on the vertical road; player travels upward (decreasing y).
-    this.light = { x: 400, y: 780, stopLine: 820, state: "green", timer: 0 };
+    this.light = { x: 455, y: 780, stopLine: 820, state: "green", timer: 0 };
     this.lightGfx = this.add.graphics().setDepth(5);
     this.drawStopLine(400, 820, true);
 
     // Stop sign on the horizontal road; player travels right (increasing x).
-    this.sign = { x: 1050, stopLine: 1000, passed: false, stopped: false };
-    this.drawStopSign(1050, 250);
-    this.drawStopLine(1000, 250, false);
+    this.sign = { x: 1080, stopLine: 1030, passed: false, stopped: false };
+    this.drawStopSign(1080, 292);
+    this.drawStopLine(1030, 302, false);
 
     // Destination marker.
     this.dest = { x: 1650, y: 250, r: 60 };
@@ -58,7 +68,7 @@ export default class Stage2Scene extends Phaser.Scene {
     this.lightPassed = false;
 
     // Controls (fixed in Drive; city driving). HUD/pedals stay on screen.
-    this.dc = new DriveControls(this, { gear: "D" });
+    this.dc = new DriveControls(this, { selectors: true, gear: "D", range: "H" });
     this.dc.container.setScrollFactor(0);
 
     this.banner = this.dialog.banner(t("s2_obj"));
@@ -69,14 +79,27 @@ export default class Stage2Scene extends Phaser.Scene {
 
   drawRoads() {
     const g = this.add.graphics().setDepth(1);
-    ROADS.forEach((r) => {
-      g.fillStyle(COLORS.road, 1);
-      g.fillRect(r.x, r.y, r.w, r.h);
-    });
-    // Lane dashes.
-    g.fillStyle(COLORS.roadLine, 0.9);
-    for (let y = 200; y < 1350; y += 70) g.fillRect(396, y, 8, 36); // vertical centre
-    for (let x = 350; x < 1750; x += 70) g.fillRect(x, 246, 36, 8); // horizontal centre
+    g.lineStyle(ROAD_HALF * 2 + 14, 0x25252a, 0.8);
+    g.beginPath();
+    ROAD_PATH.forEach(([x, y], i) => (i === 0 ? g.moveTo(x, y) : g.lineTo(x, y)));
+    g.strokePath();
+
+    g.lineStyle(ROAD_HALF * 2, COLORS.road, 1);
+    g.beginPath();
+    ROAD_PATH.forEach(([x, y], i) => (i === 0 ? g.moveTo(x, y) : g.lineTo(x, y)));
+    g.strokePath();
+
+    g.lineStyle(8, COLORS.roadLine, 0.9);
+    for (let i = 0; i < ROAD_PATH.length - 1; i++) {
+      const [x0, y0] = ROAD_PATH[i];
+      const [x1, y1] = ROAD_PATH[i + 1];
+      const len = Phaser.Math.Distance.Between(x0, y0, x1, y1);
+      for (let d = 18; d < len; d += 74) {
+        const a = d / len;
+        const b = Math.min((d + 34) / len, 1);
+        g.lineBetween(Phaser.Math.Linear(x0, x1, a), Phaser.Math.Linear(y0, y1, a), Phaser.Math.Linear(x0, x1, b), Phaser.Math.Linear(y0, y1, b));
+      }
+    }
   }
 
   decorate() {
@@ -126,7 +149,17 @@ export default class Stage2Scene extends Phaser.Scene {
   }
 
   isOnRoad(x, y) {
-    return ROADS.some((r) => x >= r.x - 10 && x <= r.x + r.w + 10 && y >= r.y - 10 && y <= r.y + r.h + 10);
+    return this.distanceToRoad(x, y) <= ROAD_HALF + 12;
+  }
+
+  distanceToRoad(x, y) {
+    let best = Infinity;
+    for (let i = 0; i < ROAD_PATH.length - 1; i++) {
+      const [x0, y0] = ROAD_PATH[i];
+      const [x1, y1] = ROAD_PATH[i + 1];
+      best = Math.min(best, pointSegmentDistance(x, y, x0, y0, x1, y1));
+    }
+    return best;
   }
 
   update(time, dtMs) {
@@ -134,29 +167,34 @@ export default class Stage2Scene extends Phaser.Scene {
     const dt = dtMs / 1000;
     this.dc.update(dtMs);
 
-    // Speed dynamics.
-    const ACCEL = 320;
-    const BRAKE = 620;
-    const ROLL = 120;
-    const MAX = 430;
-    this.speed += this.dc.throttle * ACCEL * dt;
-    this.speed -= this.dc.brakeInput * BRAKE * dt;
-    this.speed -= ROLL * dt;
+    const drive = this.dc.getDriveSpec();
+    if (drive.dir === 0) {
+      this.speed = toward(this.speed, 0, (drive.rollingDrag + this.dc.brakeInput * drive.brakeDrag) * dt);
+    } else {
+      this.speed += this.dc.throttle * 350 * drive.torque * drive.dir * dt;
+      this.speed = toward(this.speed, 0, drive.rollingDrag * dt);
+      this.speed = toward(this.speed, 0, this.dc.brakeInput * drive.brakeDrag * dt);
+    }
 
     const onRoad = this.isOnRoad(this.vehicle.x, this.vehicle.y);
     if (!onRoad) {
-      this.speed -= 160 * dt; // heavy drag off-road, but still recoverable under throttle
+      this.offroadTimer += dt;
+      this.speed = toward(this.speed, 0, 210 * dt); // heavy drag off-road, but still recoverable under throttle
       if (!this._offroadWarn) {
         this._offroadWarn = true;
         this.dialog.toast(t("s2_offroad"), { color: "#d8a54a", duration: 1200 });
         this.time.delayedCall(1500, () => (this._offroadWarn = false));
       }
+      if (this.offroadTimer > 2.2 || this.distanceToRoad(this.vehicle.x, this.vehicle.y) > 260) this.failOffroad();
+    } else {
+      this.offroadTimer = 0;
     }
-    this.speed = Phaser.Math.Clamp(this.speed, 0, onRoad ? MAX : 140);
+    const max = onRoad ? drive.maxSpeed : Math.min(130, drive.maxSpeed);
+    this.speed = Phaser.Math.Clamp(this.speed, -max, max);
 
     // Kinematic bicycle steering: only the front wheels steer, and the body only
     // yaws when the vehicle is moving. This prevents pivoting in place.
-    if (this.speed > 4) {
+    if (Math.abs(this.speed) > 4) {
       const steerAngle = this.dc.steer * MAX_STEER_ANGLE;
       this.vehicle.rotation += (this.speed / WHEELBASE) * Math.tan(steerAngle) * dt;
     }
@@ -169,7 +207,7 @@ export default class Stage2Scene extends Phaser.Scene {
     this.vehicle.x = Phaser.Math.Clamp(this.vehicle.x, 0, WORLD_W);
     this.vehicle.y = Phaser.Math.Clamp(this.vehicle.y, 0, WORLD_H);
 
-    this.dc.setSpeedDisplay(this.speed * 0.11);
+    this.dc.setSpeedDisplay(Math.abs(this.speed) * 0.11, this.dc.getRpm(this.speed, { load: onRoad ? 0.15 : 0.55 }));
 
     this.updateTrafficLight(dt);
     this.checkStopSign();
@@ -237,8 +275,31 @@ export default class Stage2Scene extends Phaser.Scene {
       this.dialog.toast(t("s2_arrived"), { color: "#6fbf5a", duration: 1600 });
       const score = Math.max(0, 100 - this.penalty);
       this.time.delayedCall(1400, () =>
-        this.scene.start("StageCompleteScene", { stage: 2, score, nextScene: "Stage3Scene" })
+        this.scene.start("StageCompleteScene", { stage: 4, score, nextScene: "Stage3Scene" })
       );
     }
   }
+
+  failOffroad() {
+    this.finished = true;
+    this.penalty += 30;
+    this.dialog.toast(t("s2_failed_offroad"), { color: "#d85a4a", duration: 2200 });
+    this.time.delayedCall(1600, () => this.scene.restart());
+  }
+}
+
+function pointSegmentDistance(px, py, ax, ay, bx, by) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const lenSq = dx * dx + dy * dy;
+  const t = lenSq === 0 ? 0 : Phaser.Math.Clamp(((px - ax) * dx + (py - ay) * dy) / lenSq, 0, 1);
+  const x = ax + dx * t;
+  const y = ay + dy * t;
+  return Phaser.Math.Distance.Between(px, py, x, y);
+}
+
+function toward(v, target, step) {
+  if (v > target) return Math.max(target, v - step);
+  if (v < target) return Math.min(target, v + step);
+  return v;
 }

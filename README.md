@@ -15,26 +15,31 @@ Hebrew is the default language. English is also available from the title screen.
 
 1. **Controls Tour** — tap every driver control to learn what it does, then run the
    start-up sequence (parking brake, wait-to-start glow plugs, start, select a gear).
-2. **City Driving** — top-down simulator: obey lights/signs, stay on the road, reach the
-   destination.
-3. **Off-Road & Gears** — drills the **transfer case** (`H / HL / N / L`) and
+2. **Transmission & T-Case** — learn the physical shifter layout before driving:
+   transfer case on the left (`HL / H / N / L`), transmission on the right.
+3. **Obstacle Judgment** — answer randomized passable/impassable questions for
+   grades, side-slopes, steps, trenches, and tree/log obstacles.
+4. **City Driving** — top-down simulator: use forward and reverse, obey lights/signs,
+   stay on curved roads, and reach the destination.
+5. **Off-Road & Gears** — drills the **transfer case** (`HL / H / N / L`) and
    **transmission** (`P / R / N / OD / D / 2 / 1`) against terrain scenarios.
-4. **Technical Off-Road** — slopes, side-slopes, traction loss (3-wheel), and water
-   fording, using the techniques from Stage 3.
-5. **Trailer Parking** — hitch up and reverse an M149 water trailer into a marked
+6. **Technical Off-Road** — slopes, side-slopes, traction loss (3-wheel), and water
+   fording, including a rear/isometric view for side-slope judgment.
+7. **Trailer Parking** — hitch up and reverse an M149 water trailer into a marked
    bay (articulated trailer physics; reverse steering is inverted).
-6. **Pre/Post Checks** — inspect tires, oil, fluids, belts, hoses, wiring, leaks, and
+8. **Pre/Post Checks** — inspect tires, oil, fluids, belts, hoses, wiring, leaks, and
    post-drive tire/hub condition.
-7. **Gauge Scan** — answer quiz questions about oil pressure, temperature, fuel,
+9. **Gauge Scan** — answer quiz questions about oil pressure, temperature, fuel,
    speed/odometer, and voltage readings.
-8. **Humvee Trivia** — answer history and specification questions based on the English
+10. **Humvee Trivia** — answer history and specification questions based on the English
    and Hebrew Wikipedia pages for Humvee.
 
 ## Controls
 
 On a phone, **tilt to steer** (tap the wheel to re-centre); on desktop use the arrow
 keys / WASD, a connected gamepad's left stick and triggers, or drag the on-screen wheel.
-Gas/brake are the on-screen pedals. A
+Gas/brake are the on-screen pedals. Driving HUDs show speed, RPM, gear, and range so
+transmission and transfer-case choices visibly affect engine speed and vehicle speed. A
 **fullscreen** button (⛶) is on the menu and every stage — best experienced
 fullscreen in landscape. After loading, the opening about page has a Continue button that
 requests fullscreen before entering the menu.
@@ -57,7 +62,7 @@ The in-game credits page links to the repository, issue tracker, and GitHub prof
 ## Contributing
 
 Bug reports and fixes are welcome. Content corrections are especially valuable: vehicle
-controls, gauges, pre/post driving checks, transfer-case and transmission behavior,
+controls, gauges, obstacle limits, pre/post driving checks, transfer-case and transmission behavior,
 trailer handling, and top-down driving physics should be reported when they are wrong or
 misleading.
 
