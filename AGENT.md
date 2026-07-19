@@ -45,17 +45,18 @@ js/ui/LangSwitch.js      EN/HE toggle (restarts scene to re-render + flip RTL)
 js/ui/fullscreen.js      addFullscreenButton(scene, x, y)
 js/scenes/BootScene.js   resolves art (override->procedural) + procedural generators
 js/scenes/MenuScene.js   title, stage cards (count-driven layout), lang, fullscreen
-js/scenes/Stage1..8.js   the eight stages (see below)
+js/scenes/Stage1..8.js plus StageGear/StageObstacle   the ten stages (see below)
 js/scenes/StageCompleteScene.js  score summary + next/menu
-assets/photos/           real museum photos (override AI/procedural)
+assets/photos/           curated real photos (override AI/procedural)
+assets/photos/_album_raw/ gitignored raw Google Photos album dump
 assets/ai/               AI-generated alternates (Gemini via OpenRouter)
 assets/overrides.json    id -> image path map (the only art-wiring file)
 .github/workflows/deploy-pages.yml   GitHub Pages deploy
 ```
 
-## The eight stages
+## The ten stages
 
-Stages unlock sequentially (complete N → unlock N+1), tracked in `progress.js`.
+All stages are directly selectable. Best score per stage is tracked in `progress.js`.
 Each stage ends by starting `StageCompleteScene` with `{ stage, score, nextScene }`.
 
 1. **Driver Controls** (`Stage1Scene`) — first-person cockpit (real photo
@@ -64,35 +65,45 @@ Each stage ends by starting `StageCompleteScene` with `{ stage, score, nextScene
    After all 12 are reviewed, dismissing the final card starts a guided **start-up
    sequence** checklist (parking brake → N → RUN → wait-to-start glow plugs → START
    → release brake → D).
-2. **City Driving** (`Stage2Scene`) — top-down. Obey a traffic light + stop sign,
-   stay on the road (L-shaped course), reach the destination. Manual kinematics
-   (no arcade bodies): heading + speed; forward vector `(sinθ, -cosθ)`. Uses a
-   kinematic bicycle yaw model so the vehicle cannot pivot in place.
-3. **Off-Road & Gears** (`Stage3Scene`) — top-down trail with gear **gates** that
+2. **Transmission & T-Case** (`StageGearScene`) — focused shifter lesson using the
+   real shifter closeup. Transfer case is on the left in physical order
+   `HL / H / N / L`; transmission is on the right in order `P / R / N / OD / D / 2 / 1`.
+   Range changes are only accepted while the transmission is in `N`.
+3. **Obstacle Judgment** (`StageObstacleScene`) — randomized passable/impassable
+   terrain quiz for grade, side-slope, vertical step, trench, and log/tree obstacles.
+   Shows the source/threshold after each answer. Grade/side-slope values come from
+   TM 9-2320-280-10 and TC 21-305-20 Figure 7-13; step/log/trench values are simplified
+   training thresholds with source caveats in the scene text.
+4. **City Driving** (`Stage2Scene`) — top-down. Obey a traffic light + stop sign,
+   stay on curved roads, use forward/reverse, and reach the destination. Manual
+   kinematics (no arcade bodies): heading + signed speed; forward vector
+   `(sinθ, -cosθ)`. Uses a kinematic bicycle yaw model so the vehicle cannot pivot
+   in place. Fails/restarts if the player drives too far off-road.
+5. **Off-Road & Gears** (`Stage3Scene`) — top-down trail with gear **gates** that
    only open when the correct transfer case + transmission are selected
    (reverse→R, slippery→HL, climb→L+1, cruise→H+D/OD). Teaches terrain→gear mapping.
    Uses signed-speed bicycle yaw so reverse steering emerges from motion direction.
    Transfer-case range changes are rejected unless the vehicle is stopped and the
    transmission is in N, matching TM drivetrain-protection guidance.
-4. **Technical Off-Road** (`Stage4Scene`) — **side view** with a terrain heightmap
-   and pitch/roll indicators. Steep climb (needs low range + momentum), descent
-   (engine braking), side-slope rollover meter, 3-wheel/traction-loss, water
-   fording. Uses **signed speed** (negative = reverse); P holds, N rolls with
-   gravity, forward/R drive.
+6. **Technical Off-Road** (`Stage4Scene`) — side view with a terrain heightmap and
+   pitch/roll indicators. The side-slope section switches to a rear/isometric camera
+   so body roll is visible. Steep climb (needs low range + momentum), descent
+   (engine braking), side-slope rollover meter, 3-wheel/traction-loss, water fording.
+   Uses signed speed (negative = reverse); P holds, N rolls with gravity, forward/R drive.
    Source note: TM 9-2320-280-10 lists 60% grade and 40% side-slope capabilities as
    textual performance values, but no verified slope illustration. The verified
    illustrated HMMWV slope/climb figure is TC 21-305-20/AFMAN 24-306(I), Figure 7-13.
-5. **Trailer Parking** (`Stage5Scene`) — top-down articulated **water trailer
+7. **Trailer Parking** (`Stage5Scene`) — top-down articulated **water trailer
    (M149)**. Intro shows a real trailer photo + explains reverse steering. Park the
    trailer in a marked bay (aligned within 14°, stopped ~1s). Jackknife warning
    when articulation > ~77°.
-6. **Pre/Post Checks** (`Stage6Scene`) — photo-led inspection checklist. Covers
+8. **Pre/Post Checks** (`Stage6Scene`) — photo-led inspection checklist. Covers
    tire pressure/condition, engine oil, fluid reservoirs, belts/hoses/wiring, and
    air restriction, post-drive leak/tire/hub checks.
-7. **Gauge Scan** (`Stage7Scene`) — close-up gauge quiz. Tap oil pressure,
+9. **Gauge Scan** (`Stage7Scene`) — close-up gauge quiz. Tap oil pressure,
    temperature, fuel, speed/odometer, and voltmeter hotspots, then answer the
    multiple-choice operational question. Wrong answers reduce score.
-8. **Humvee Trivia** (`Stage8Scene`) — multiple-choice trivia based on the English
+10. **Humvee Trivia** (`Stage8Scene`) — multiple-choice trivia based on the English
    and Hebrew Wikipedia pages for Humvee:
    `https://en.wikipedia.org/wiki/Humvee` and `https://he.wikipedia.org/wiki/Humvee`.
    Keep facts high-level and non-operational: name meaning, manufacturer, service
@@ -114,11 +125,14 @@ Steering input priority each frame: **keyboard > wheel drag > device tilt > cent
   on first pointer. This is the requested main mobile control — keep it working.
 - **Wheel drag** and **keyboard** (arrows/WASD) remain as fallbacks (keyboard also
   makes headless testing possible).
-- Pedals are hold-to-apply (`throttle`/`brakeInput` ramp). Optional gear selectors
+- Pedals are hold-to-apply (`throttle`/`brakeInput` ramp). Driving stages with gas
+  should call `getDriveSpec()` / `getRpm()` so gear/range choices affect acceleration,
+  speed ceiling, load, and RPM consistently.
+- Optional gear selectors
   (`selectors: true`) render the transmission (`P R N OD D 2 1`) + transfer
-  (`H HL N L`) columns and emit `onGear`/`onRange`. Match the cockpit photos:
+  (`HL H N L`) columns and emit `onGear`/`onRange`. Match the cockpit photos:
   transfer case on the left, transmission on the right.
-- HUD (`setSpeedDisplay`) shows SPD/GEAR/RANGE.
+- HUD (`setSpeedDisplay`) shows speed, RPM, gear, and range when RPM is provided.
 
 When embedding in a scrolling scene, set `dc.container.setScrollFactor(0)` so the
 HUD/wheel/pedals stay pinned (they're built in screen space). `Dialog` outputs are
@@ -139,21 +153,38 @@ Before Phaser engine, scene lifecycle, or input work, install and use the releva
 official Phaser Codex skills from:
 `https://github.com/phaserjs/phaser/tree/master/skills`
 
-For this repo, the default recommended set is:
-- `v3-to-v4-migration` (`/root/.codex/skills/v3-to-v4-migration/SKILL.md`) for
-  Phaser 4 migration and API compatibility work.
-- `input-keyboard-mouse-touch` (`/root/.codex/skills/input-keyboard-mouse-touch/SKILL.md`)
-  for keyboard, pointer, touch, drag, and gamepad controls.
-- `physics-matter` (`/root/.codex/skills/physics-matter/SKILL.md`) for Matter.js
-  bodies, constraints, sensors, collision filtering, and future rigid-body vehicle
-  or trailer experiments.
-- `events-system` (`/root/.codex/skills/events-system/SKILL.md`) for scene/input
-  event subscription and cleanup patterns.
-- `scenes` (`/root/.codex/skills/scenes/SKILL.md`) for scene lifecycle,
-  starting/stopping scenes, and shutdown behavior.
+Installed official Phaser skills in this repo/session:
+- `actions-and-utilities`
+- `animations`
+- `audio-and-sound`
+- `cameras`
+- `curves-and-paths`
+- `data-manager`
+- `events-system`
+- `filters-and-postfx`
+- `game-object-components`
+- `game-setup-and-config`
+- `geometry-and-math`
+- `graphics-and-shapes`
+- `groups-and-containers`
+- `input-keyboard-mouse-touch`
+- `loading-assets`
+- `particles`
+- `physics-arcade`
+- `physics-matter`
+- `render-textures`
+- `scale-and-responsive`
+- `scenes`
+- `sprites-and-images`
+- `text-and-bitmaptext`
+- `tilemaps`
+- `time-and-timers`
+- `tweens`
+- `v3-to-v4-migration`
+- `v4-new-features`
 
-If more Phaser skills are installed under `/root/.codex/skills`, add them here before
-working on the matching Phaser subsystem.
+Each lives at `/root/.codex/skills/<skill-name>/SKILL.md`. Read the matching skill
+before changing that Phaser subsystem.
 
 ## Fullscreen (`js/ui/fullscreen.js`)
 `addFullscreenButton(scene, x, y)` — must be triggered by a pointer gesture (it is).
@@ -182,6 +213,9 @@ procedural fallback** (drawn in `BootScene.gen_*`). One manifest fetch, no 404 s
 - Real photos live in `assets/photos/`; AI alternates in `assets/ai/`. To change the
   art for an id, edit `assets/overrides.json` only. A real photo always wins because
   the JSON points at it.
+- Raw album downloads live in `assets/photos/_album_raw/`, which is intentionally
+  gitignored. Promote only cropped/compressed assets from that folder into tracked
+  `assets/photos/`.
 - Ids include `title_art`, `dashboard_panel`, `trail_bg`, `trailer_photo`,
   Stage 1 closeups (`closeup_steering`, `closeup_gauges`, `closeup_panel`,
   `closeup_switch`, `closeup_shifters`), Stage 6 inspection photos

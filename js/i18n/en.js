@@ -160,11 +160,17 @@ export const en = {
   s3obs_impassable: "Impassable",
   s3obs_correct: "Correct.",
   s3obs_wrong: "Not safe for that value.",
+  s3obs_inches: "{n} in",
   s3obs_grade: "climb grade",
   s3obs_side: "side slope",
   s3obs_step: "vertical step",
   s3obs_trench: "trench width",
   s3obs_log: "tree/log height",
+  s3obs_limit_grade: "Limit used: 60% grade from TM 9-2320-280-10.",
+  s3obs_limit_side: "Limit used: 40% side slope from TM 9-2320-280-10.",
+  s3obs_limit_step: "Limit used: 18 in vertical step from ATPD-2099E testing.",
+  s3obs_limit_trench: "Training threshold used: 30 in trench; treat as a simplified judgment value.",
+  s3obs_limit_log: "Training threshold used: 10 in log/tree obstacle, informed by FM 5-102 obstacle guidance.",
   s3obs_source:
     "Sources: TM 9-2320-280-10 60% grade and 40% side-slope values; TC 21-305-20 Figure 7-13; ATPD-2099E vertical step test; FM 5-102 log-obstacle guidance. Trench/log values are simplified training thresholds.",
 

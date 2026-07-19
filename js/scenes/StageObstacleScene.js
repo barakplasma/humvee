@@ -24,6 +24,7 @@ export default class StageObstacleScene extends Phaser.Scene {
     this.index = 0;
     this.correct = 0;
     this.current = null;
+    this.locked = false;
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, COLORS.armyGreenDark, 1).setOrigin(0);
     this.makeBackButton();
@@ -41,7 +42,7 @@ export default class StageObstacleScene extends Phaser.Scene {
     this.diagram = this.add.graphics().setDepth(10);
     this.truckLayer = this.add.container(0, 0).setDepth(11);
     this.prompt = this.add
-      .text(GAME_WIDTH / 2, 560, "", {
+      .text(GAME_WIDTH / 2, 536, "", {
         fontFamily: FONT,
         fontSize: "28px",
         color: "#f2ecd8",
@@ -50,10 +51,19 @@ export default class StageObstacleScene extends Phaser.Scene {
         wordWrap: { width: 960 },
       })
       .setOrigin(0.5);
-    this.source = this.add
-      .text(GAME_WIDTH / 2, 678, t("s3obs_source"), {
+    this.feedback = this.add
+      .text(GAME_WIDTH / 2, 576, "", {
         fontFamily: FONT,
-        fontSize: "15px",
+        fontSize: "19px",
+        color: "#c9b98f",
+        align: "center",
+        wordWrap: { width: 980 },
+      })
+      .setOrigin(0.5);
+    this.source = this.add
+      .text(GAME_WIDTH / 2, 680, t("s3obs_source"), {
+        fontFamily: FONT,
+        fontSize: "14px",
         color: "#c9b98f",
         align: "center",
         wordWrap: { width: 960 },
@@ -89,6 +99,8 @@ export default class StageObstacleScene extends Phaser.Scene {
   }
 
   nextQuestion() {
+    this.locked = false;
+    this.feedback.setText("");
     this.current = makeQuestion(TYPES[Phaser.Math.Between(0, TYPES.length - 1)]);
     this.index++;
     this.drawQuestion();
@@ -104,7 +116,7 @@ export default class StageObstacleScene extends Phaser.Scene {
     else if (q.type === "step") this.drawStep(q.value);
     else if (q.type === "trench") this.drawTrench(q.value);
     else this.drawLog(q.value);
-    this.prompt.setText(t("s3obs_prompt", { n: this.index, total: QUESTIONS, label: t(q.labelKey), value: q.text }));
+    this.prompt.setText(t("s3obs_prompt", { n: this.index, total: QUESTIONS, label: t(q.labelKey), value: q.text() }));
   }
 
   drawBase() {
@@ -194,8 +206,13 @@ export default class StageObstacleScene extends Phaser.Scene {
   }
 
   answer(passable) {
+    if (this.locked) return;
+    this.locked = true;
     const ok = passable === this.current.passable;
     if (ok) this.correct++;
+    this.feedback
+      .setColor(ok ? "#6fbf5a" : "#d8a54a")
+      .setText(`${ok ? t("s3obs_correct") : t("s3obs_wrong")} ${t(this.current.limitKey)}`);
     this.dialog.toast(ok ? t("s3obs_correct") : t("s3obs_wrong"), {
       color: ok ? "#6fbf5a" : "#d85a4a",
       duration: 900,
@@ -214,22 +231,57 @@ export default class StageObstacleScene extends Phaser.Scene {
 function makeQuestion(type) {
   if (type === "grade") {
     const value = randInt(35, 78);
-    return { type, value, passable: value <= LIMITS.gradePct, labelKey: "s3obs_grade", text: `${value}%` };
+    return {
+      type,
+      value,
+      passable: value <= LIMITS.gradePct,
+      labelKey: "s3obs_grade",
+      limitKey: "s3obs_limit_grade",
+      text: () => `${value}%`,
+    };
   }
   if (type === "side") {
     const value = randInt(24, 55);
-    return { type, value, passable: value <= LIMITS.sidePct, labelKey: "s3obs_side", text: `${value}%` };
+    return {
+      type,
+      value,
+      passable: value <= LIMITS.sidePct,
+      labelKey: "s3obs_side",
+      limitKey: "s3obs_limit_side",
+      text: () => `${value}%`,
+    };
   }
   if (type === "step") {
     const value = randInt(8, 30);
-    return { type, value, passable: value <= LIMITS.stepIn, labelKey: "s3obs_step", text: `${value} in` };
+    return {
+      type,
+      value,
+      passable: value <= LIMITS.stepIn,
+      labelKey: "s3obs_step",
+      limitKey: "s3obs_limit_step",
+      text: () => t("s3obs_inches", { n: value }),
+    };
   }
   if (type === "trench") {
     const value = randInt(16, 42);
-    return { type, value, passable: value <= LIMITS.trenchIn, labelKey: "s3obs_trench", text: `${value} in` };
+    return {
+      type,
+      value,
+      passable: value <= LIMITS.trenchIn,
+      labelKey: "s3obs_trench",
+      limitKey: "s3obs_limit_trench",
+      text: () => t("s3obs_inches", { n: value }),
+    };
   }
   const value = randInt(5, 18);
-  return { type, value, passable: value <= LIMITS.logIn, labelKey: "s3obs_log", text: `${value} in` };
+  return {
+    type,
+    value,
+    passable: value <= LIMITS.logIn,
+    labelKey: "s3obs_log",
+    limitKey: "s3obs_limit_log",
+    text: () => t("s3obs_inches", { n: value }),
+  };
 }
 
 function randInt(min, max) {
