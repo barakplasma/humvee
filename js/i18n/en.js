@@ -25,6 +25,8 @@ export const en = {
     "Learn the Humvee A2 controls, start-up flow, driving basics, off-road gear choices, trailer reversing, inspections, and gauges.",
   about_safety:
     "This is a simplified training aid, not an official manual. Use real technical manuals, instruction, and supervision before operating an actual vehicle.",
+  about_sources:
+    "Sources reviewed: TM 9-2320-280-10; TC 21-305-4; FM 21-305; FM 90-3; TC 21-305-20/AFMAN 24-306(I); English/Hebrew Wikipedia Humvee pages.",
   about_continue: "Continue fullscreen",
 
   // ---- Menu / stage select ----
@@ -216,26 +218,32 @@ export const en = {
   s7_progress: "Gauge quiz: {done} / {total}",
   s7_correct: "Correct.",
   s7_wrong: "Not quite. Try that gauge again.",
+  s7_source: "Gauge layout/source: TM 9-2320-280-10 instrument-panel item/function pages and PMCS instrument-panel checks.",
+  s7_oil_label: "OIL PRESS",
   s7_oil_title: "Oil Pressure",
   s7_oil_body:
     "Oil pressure confirms the engine is being lubricated. A sudden drop, flicker, or less than 6 psi at idle means stop safely and investigate.",
   s7_oil_question: "The oil pressure drops suddenly while driving. What should you do?",
   s7_oil_choice_stop: "Stop safely and investigate",
+  s7_temp_label: "COOLANT TEMP",
   s7_temp_title: "Engine Temperature",
   s7_temp_body:
     "Temperature shows cooling-system health. Rising temperature under load means reduce strain, check airflow, coolant, fan belts, and leaks. A reading above 230°F / 110°C is a no-go condition.",
   s7_temp_question: "The temperature gauge climbs under load. What is the best first response?",
   s7_temp_choice_reduce: "Reduce strain and check cooling",
+  s7_fuel_label: "FUEL",
   s7_fuel_title: "Fuel Level",
   s7_fuel_body:
     "Fuel level is part of route planning. Off-road work and low range burn more fuel than steady road driving.",
   s7_fuel_question: "You are entering a long low-range off-road section. What does this gauge affect?",
   s7_fuel_choice_plan: "Fuel and route planning",
+  s7_speed_label: "SPEED / ODO",
   s7_speed_title: "Speedometer / Odometer",
   s7_speed_body:
     "Speed helps you obey limits and choose the right gear range. The odometer supports fuel, maintenance, and mission tracking.",
   s7_speed_question: "Why scan speed while choosing gear range?",
   s7_speed_choice_adjust: "Match speed to limits and gear range",
+  s7_volt_label: "VOLTS",
   s7_volt_title: "Voltmeter",
   s7_volt_body:
     "Voltage shows charging-system health. A needle staying in the yellow or red range can mean battery, alternator, or regulator trouble.",
@@ -252,6 +260,7 @@ export const en = {
   s8_correct: "Correct.",
   s8_wrong: "Not quite.",
   s8_source: "Trivia source: Wikipedia pages for Humvee in English and Hebrew.",
+  s8_source_wikipedia: "Source: English and Hebrew Wikipedia Humvee pages.",
   s8_q_name: "What does HMMWV stand for?",
   s8_a_hmmwv: "High Mobility Multipurpose Wheeled Vehicle",
   s8_a_hummer: "Heavy Utility Mountain Military Vehicle",

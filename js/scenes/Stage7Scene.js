@@ -8,6 +8,7 @@ const GAUGES = [
   {
     key: "oil",
     title: "s7_oil_title",
+    label: "s7_oil_label",
     body: "s7_oil_body",
     question: "s7_oil_question",
     choices: ["s7_oil_choice_stop", "s7_choice_ignore", "s7_choice_speedup", "s7_choice_lights"],
@@ -18,6 +19,7 @@ const GAUGES = [
   {
     key: "temp",
     title: "s7_temp_title",
+    label: "s7_temp_label",
     body: "s7_temp_body",
     question: "s7_temp_question",
     choices: ["s7_temp_choice_reduce", "s7_choice_ignore", "s7_choice_park", "s7_choice_lights"],
@@ -28,6 +30,7 @@ const GAUGES = [
   {
     key: "fuel",
     title: "s7_fuel_title",
+    label: "s7_fuel_label",
     body: "s7_fuel_body",
     question: "s7_fuel_question",
     choices: ["s7_fuel_choice_plan", "s7_choice_ignore", "s7_choice_park", "s7_choice_lights"],
@@ -38,6 +41,7 @@ const GAUGES = [
   {
     key: "speed",
     title: "s7_speed_title",
+    label: "s7_speed_label",
     body: "s7_speed_body",
     question: "s7_speed_question",
     choices: ["s7_speed_choice_adjust", "s7_choice_ignore", "s7_choice_park", "s7_choice_lights"],
@@ -48,6 +52,7 @@ const GAUGES = [
   {
     key: "volt",
     title: "s7_volt_title",
+    label: "s7_volt_label",
     body: "s7_volt_body",
     question: "s7_volt_question",
     choices: ["s7_volt_choice_check", "s7_choice_ignore", "s7_choice_speedup", "s7_choice_park"],
@@ -85,6 +90,15 @@ export default class Stage7Scene extends Phaser.Scene {
 
     this.hotspots = {};
     GAUGES.forEach((gauge) => this.makeHotspot(gauge));
+    this.add
+      .text(GAME_WIDTH / 2, 662, t("s7_source"), {
+        fontFamily: FONT,
+        fontSize: "15px",
+        color: "#9c8f68",
+        align: "center",
+        wordWrap: { width: 900 },
+      })
+      .setOrigin(0.5);
     this.updateProgress();
   }
 
@@ -110,7 +124,23 @@ export default class Stage7Scene extends Phaser.Scene {
     const ring = this.add.graphics().setDepth(20);
     const zone = this.add.circle(x, y, 46).setDepth(21).setInteractive({ useHandCursor: true });
     zone.setFillStyle(0xffffff, 0.001);
-    this.hotspots[gauge.key] = { gauge, ring, x, y };
+    const labelY = y < GAME_HEIGHT / 2 ? y + 56 : y - 56;
+    const plate = this.add
+      .rectangle(x, labelY, 138, 28, COLORS.panel, 0.78)
+      .setStrokeStyle(1, COLORS.sandDark)
+      .setDepth(18);
+    const label = this.add
+      .text(x, labelY, t(gauge.label), {
+        fontFamily: FONT,
+        fontSize: "13px",
+        color: "#f2ecd8",
+        fontStyle: "bold",
+        align: "center",
+        wordWrap: { width: 124 },
+      })
+      .setOrigin(0.5)
+      .setDepth(19);
+    this.hotspots[gauge.key] = { gauge, ring, plate, label, x, y };
     this.drawRing(gauge.key);
     zone.on("pointerup", () => this.reviewGauge(gauge));
   }
@@ -119,6 +149,8 @@ export default class Stage7Scene extends Phaser.Scene {
     const hs = this.hotspots[key];
     const done = this.seen.has(key);
     hs.ring.clear();
+    hs.plate.setFillStyle(done ? COLORS.good : COLORS.panel, done ? 0.9 : 0.78);
+    hs.label.setColor(done ? "#161a10" : "#f2ecd8");
     hs.ring.lineStyle(5, done ? COLORS.good : COLORS.hotspot, 1);
     hs.ring.strokeCircle(hs.x, hs.y, 42);
     if (done) {

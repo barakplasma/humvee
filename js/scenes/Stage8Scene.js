@@ -11,36 +11,42 @@ const QUESTIONS = [
     choices: ["s8_a_hmmwv", "s8_a_hummer", "s8_a_mrap", "s8_a_jltv"],
     correct: 0,
     note: "s8_note_name",
+    source: "s8_source_wikipedia",
   },
   {
     q: "s8_q_maker",
     choices: ["s8_a_am_general", "s8_a_ford", "s8_a_oshkosh", "s8_a_chrysler"],
     correct: 0,
     note: "s8_note_maker",
+    source: "s8_source_wikipedia",
   },
   {
     q: "s8_q_service",
     choices: ["s8_a_1985", "s8_a_1941", "s8_a_1996", "s8_a_2015"],
     correct: 0,
     note: "s8_note_service",
+    source: "s8_source_wikipedia",
   },
   {
     q: "s8_q_drive",
     choices: ["s8_a_independent_4x4", "s8_a_tracks", "s8_a_rear_drive", "s8_a_six_wheel"],
     correct: 0,
     note: "s8_note_drive",
+    source: "s8_source_wikipedia",
   },
   {
     q: "s8_q_fuel",
     choices: ["s8_a_25_gal", "s8_a_10_gal", "s8_a_50_gal", "s8_a_95_gal_us"],
     correct: 0,
     note: "s8_note_fuel",
+    source: "s8_source_wikipedia",
   },
   {
     q: "s8_q_replacement",
     choices: ["s8_a_jltv_program", "s8_a_hummer_h1", "s8_a_gama_goat", "s8_a_cucv"],
     correct: 0,
     note: "s8_note_replacement",
+    source: "s8_source_wikipedia",
   },
 ];
 
@@ -155,12 +161,12 @@ export default class Stage8Scene extends Phaser.Scene {
     if (isCorrect) {
       this.correct++;
       this.choiceButtons[choiceIndex].bg.setFillStyle(0x3f7f38, 1);
-      this.feedback.setColor("#6fbf5a").setText(`${t("s8_correct")} ${t(item.note)}`);
+      this.feedback.setColor("#6fbf5a").setText(`${t("s8_correct")} ${t(item.note)}\n${t(item.source)}`);
     } else {
       this.mistakes++;
       this.choiceButtons[choiceIndex].bg.setFillStyle(0x8f332d, 1);
       this.choiceButtons[item.correct].bg.setFillStyle(0x3f7f38, 1);
-      this.feedback.setColor("#d8a54a").setText(`${t("s8_wrong")} ${t(item.note)}`);
+      this.feedback.setColor("#d8a54a").setText(`${t("s8_wrong")} ${t(item.note)}\n${t(item.source)}`);
     }
     this.time.delayedCall(1800, () => this.next());
   }

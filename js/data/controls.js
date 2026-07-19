@@ -36,7 +36,7 @@ export const CONTROLS = [
     id: "wipers",
     nameKey: "ctrl_wipers_name",
     descKey: "ctrl_wipers_desc",
-    pos: { x: 760, y: 120 },
+    pos: { x: 205, y: 120 },
     icon: "stalk",
   },
   {
@@ -71,7 +71,7 @@ export const CONTROLS = [
     id: "horn",
     nameKey: "ctrl_horn_name",
     descKey: "ctrl_horn_desc",
-    pos: { x: 205, y: 120 },
+    pos: { x: 540, y: 310 },
     icon: "button",
   },
   {

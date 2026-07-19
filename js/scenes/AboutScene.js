@@ -65,6 +65,17 @@ export default class AboutScene extends Phaser.Scene {
       })
       .setOrigin(0.5, 0);
 
+    this.add
+      .text(GAME_WIDTH / 2, 458, t("about_sources"), {
+        fontFamily: FONT,
+        fontSize: "17px",
+        color: "#9c8f68",
+        align: "center",
+        lineSpacing: 6,
+        wordWrap: { width: 760 },
+      })
+      .setOrigin(0.5, 0);
+
     this.dialog.makeButton(GAME_WIDTH / 2, 545, t("about_continue"), () => this.continue(), {
       width: 360,
       height: 64,

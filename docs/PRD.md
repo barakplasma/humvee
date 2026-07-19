@@ -112,6 +112,8 @@ Before shipping gameplay or layout changes:
 ## Future Work
 
 - Add a committed smoke-test harness for booting all scenes and checking common inputs.
+- Improve readability: make text larger in general, and add a user-controlled text
+  size option that can enlarge text when it still fits without overflowing.
 - Add more album closeups for pedals, parking brake, oil dipstick, coolant fill, and
   tire-pressure placards if available.
 - Add light scoring to inspection/gauge stages based on mistakes or ordering.
