@@ -12,8 +12,10 @@ perform basic checks before and after driving.
 
 - Primary: people learning the basic layout and driving concepts of a HMMWV A2.
 - Secondary: instructors or enthusiasts who want a quick interactive reference.
-- Target device: Android Chrome on a Pixel-class phone in landscape fullscreen.
-- Desktop support is required for development, keyboard fallback, and casual play.
+- Primary target: Android Chrome on a Pixel-class phone in landscape fullscreen.
+- Desktop support is required for development, keyboard fallback, gamepad/pointer
+  play, and casual play, but desktop must not drive layout or control decisions ahead
+  of the mobile experience.
 
 ## Non-Goals
 
@@ -54,6 +56,8 @@ localStorage.
 - Use real album photos where they improve recognition. Keep the Stage 1 dashboard
   overview stable because hotspots are tuned to it; use closeups inside dialogs rather
   than replacing that overview casually.
+- Treat mobile landscape/fullscreen as the baseline for every screen. Desktop should
+  work well, but it is the secondary presentation of the same mobile-first design.
 - Preserve the 1280x720 landscape design coordinate system. It keeps all stages,
   hotspots, and mobile controls predictable.
 - Keep the UI dense and functional. This is a trainer, not a marketing site.
@@ -62,13 +66,15 @@ localStorage.
 - Prefer concrete tasks over passive reading: tap controls, select gears, drive,
   reverse, inspect, and answer gauge questions.
 - Keep text concise enough for mobile cards, and add every display string through
-  `js/i18n/en.js` and `js/i18n/he.js`.
+  `src/i18n/en.ts` and `src/i18n/he.ts`.
 - Top-down driving should feel like a vehicle, not a rotateable sprite: steering
   changes heading only while the vehicle is moving, using a front-wheel bicycle model.
 
 ## Core Controls
 
 - Steering priority: keyboard, wheel drag, gamepad stick, device tilt, center.
+- On mobile, steering must work with either device tilt or thumb swipe/drag over the
+  on-screen wheel.
 - Gas and brake are hold-to-apply pedals with ramped values.
 - Gear selectors must match the cockpit photo: transfer case on the left, transmission
   on the right.
@@ -89,7 +95,7 @@ localStorage.
 
 ## Asset Guidelines
 
-- All replaceable images are declared in `js/assets/manifest.js` and mapped in
+- All replaceable images are declared in `src/assets/manifest.ts` and mapped in
   `assets/overrides.json`.
 - Real album photos live in `assets/photos/`; AI alternates may remain in `assets/ai/`.
 - Crop and compress committed photos. Keep individual JPEGs mobile-sized when possible.
@@ -100,7 +106,8 @@ localStorage.
 
 ## Technical Constraints
 
-- Static site only: vanilla ES modules, no bundler, no runtime npm dependencies.
+- Static site output: TypeScript source in `src/` compiles to vanilla ES modules in
+  `js/`; no bundler and no runtime npm dependencies.
 - Phaser is vendored locally in `js/vendor/phaser.min.js`.
 - Runtime state is localStorage only.
 - GitHub Pages deploys from the repo root on pushes to `main`.
@@ -112,6 +119,7 @@ Before shipping gameplay or layout changes:
 
 - Start a local HTTP server and boot the game in Chromium.
 - Confirm every scene loads without page exceptions.
+- Verify the changed flow in a mobile-sized landscape viewport before desktop.
 - Check Stage 1 closeup dialogs and startup completion.
 - Check driving controls: gas, brake, wheel drag, gear selectors, and transfer case.
 - Check Stage 5 trailer reversing and jackknife behavior after input changes.

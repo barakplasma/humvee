@@ -1,8 +1,9 @@
 # Humvee A2 Driver Trainer
 
 Humvee A2 Driver Trainer is a mobile-first educational game for learning the basics of a
-US military HMMWV "Humvee" A2. It runs in a modern browser, is built with
-[Phaser 4](https://phaser.io/), and ships as static files with no build step.
+US military HMMWV "Humvee" A2. It is designed first for phone landscape/fullscreen play,
+while also supporting desktop browsers with keyboard, gamepad, and pointer controls. It
+is built with [Phaser 4](https://phaser.io/) and ships as static files.
 
 Hebrew is the default language. English is also available from the title screen.
 
@@ -36,8 +37,9 @@ Hebrew is the default language. English is also available from the title screen.
 
 ## Controls
 
-On a phone, **tilt to steer** (tap the wheel to re-centre); on desktop use the arrow
-keys / WASD, a connected gamepad's left stick and triggers, or drag the on-screen wheel.
+On a phone, **tilt to steer** or thumb-swipe/drag over the on-screen wheel; tap the
+wheel to re-centre tilt. On desktop use the arrow keys / WASD, a connected gamepad's
+left stick and triggers, or drag the on-screen wheel.
 Gas/brake are the on-screen pedals. Driving HUDs show speed, RPM, gear, and range so
 transmission and transfer-case choices visibly affect engine speed and vehicle speed. A
 **fullscreen** button (⛶) is on the menu and every stage — best experienced
@@ -48,8 +50,8 @@ requests fullscreen before entering the menu.
 
 Hebrew (עברית) and English are supported, with right-to-left rendering for Hebrew.
 The game defaults to Hebrew unless the player has saved another preference. To add a
-language, copy `js/i18n/en.js` to `js/i18n/<code>.js`, translate the values, and register
-it in `js/i18n/i18n.js`.
+language, copy `src/i18n/en.ts` to `src/i18n/<code>.ts`, translate the values, register
+it in `src/i18n/i18n.ts`, and run `npm run build`.
 
 ## Credits and contact
 
@@ -73,10 +75,21 @@ Use GitHub Issues for bugs and content problems:
 Pull requests are welcome for fixes. By contributing, you agree to the contribution terms
 in [`LICENSE`](LICENSE).
 
+## Development
+
+Authored code lives in `src/` and compiles to browser-ready ES modules in `js/`.
+The project uses TypeScript with a TypeScript 7 preview check (`tsgo`) for faster
+iteration, following the incremental approach described by the VS Code team.
+
+```bash
+npm install
+npm run build
+npm run check
+```
+
 ## Run locally
 
-No dependencies to install. Serve the folder over HTTP (ES modules need `http://`, not
-`file://`):
+Serve the compiled static site over HTTP (ES modules need `http://`, not `file://`):
 
 ```bash
 python3 -m http.server 8000
@@ -95,7 +108,7 @@ Actions**.)
 
 ## Assets: real photos + AI images
 
-Art is resolved per logical id with this priority (see `js/assets/manifest.js`):
+Art is resolved per logical id with this priority (see `src/assets/manifest.ts`):
 
 **override image (real photo or AI) → procedural drawing (always available)**
 
@@ -113,7 +126,7 @@ The title and cockpit ship as **real museum photos** of an HMMWV in `assets/phot
 AI-generated alternates (Google Gemini image via OpenRouter) remain in `assets/ai/` and
 can be swapped back in by re-pointing the ids above.
 
-> Note: the Stage 1 hotspot positions in `js/data/controls.js` are tuned to the shipped
+> Note: the Stage 1 hotspot positions in `src/data/controls.ts` are tuned to the shipped
 > `dashboard_panel` cockpit photo. If you replace it with a differently-framed photo,
 > nudge those coordinates to match.
 
@@ -138,7 +151,8 @@ seamless tiling); the title and cockpit ship as AI images.
 
 ## Tech notes
 
-- Vanilla ES modules; Phaser 4.2.1 vendored locally at `js/vendor/phaser.min.js`
+- TypeScript source compiled to vanilla ES modules; Phaser 4.2.1 vendored locally at
+  `js/vendor/phaser.min.js`
   (no CDN, fully self-contained and offline-capable).
 - Progress and language are saved in `localStorage`.
 - `Phaser.Scale.FIT` keeps a 1280×720 design landscape and scales to the device; a

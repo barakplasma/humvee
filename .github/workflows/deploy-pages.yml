@@ -27,6 +27,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Build TypeScript
+        run: |
+          npm ci
+          npm run build
+          rm -rf node_modules
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
@@ -36,7 +48,7 @@ jobs:
       - name: Upload static site
         uses: actions/upload-pages-artifact@v3
         with:
-          # The whole repo is the static site (no build step).
+          # The repo root is the static site after TypeScript compiles into js/.
           path: .
 
       - name: Deploy to GitHub Pages

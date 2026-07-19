@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Replaceable art assets. Each id resolves at load time with priority:
 //   real photo / AI image (listed in assets/overrides.json)  ->  procedural drawing
 // The game always runs: if an id has no file, BootScene draws a procedural texture.
@@ -9,30 +10,27 @@
 //
 // `proc` names the procedural generator in js/scenes/BootScene.js used as fallback.
 export const ASSETS = [
-  { id: "title_art", proc: "title", fit: "cover" },
-  { id: "dashboard_panel", proc: "dashboard", fit: "cover" },
-  { id: "closeup_steering", proc: "dashboard", fit: "cover" },
-  { id: "closeup_gauges", proc: "dashboard", fit: "cover" },
-  { id: "closeup_panel", proc: "dashboard", fit: "cover" },
-  { id: "closeup_switch", proc: "dashboard", fit: "cover" },
-  { id: "closeup_shifters", proc: "dashboard", fit: "cover" },
-  { id: "inspection_engine", proc: "dashboard", fit: "cover" },
-  { id: "inspection_tire", proc: "dashboard", fit: "cover" },
-  { id: "inspection_fluids", proc: "dashboard", fit: "cover" },
-  { id: "humvee_topdown", proc: "humveeTop", fit: "contain" },
-  { id: "humvee_side", proc: "humveeSide", fit: "contain" },
-  { id: "trail_bg", proc: "trail", fit: "cover" },
-  { id: "trailer_photo", proc: "trailerPhoto", fit: "cover" },
+    { id: "title_art", proc: "title", fit: "cover" },
+    { id: "dashboard_panel", proc: "dashboard", fit: "cover" },
+    { id: "closeup_steering", proc: "dashboard", fit: "cover" },
+    { id: "closeup_gauges", proc: "dashboard", fit: "cover" },
+    { id: "closeup_panel", proc: "dashboard", fit: "cover" },
+    { id: "closeup_switch", proc: "dashboard", fit: "cover" },
+    { id: "closeup_shifters", proc: "dashboard", fit: "cover" },
+    { id: "inspection_engine", proc: "dashboard", fit: "cover" },
+    { id: "inspection_tire", proc: "dashboard", fit: "cover" },
+    { id: "inspection_fluids", proc: "dashboard", fit: "cover" },
+    { id: "humvee_topdown", proc: "humveeTop", fit: "contain" },
+    { id: "humvee_side", proc: "humveeSide", fit: "contain" },
+    { id: "trail_bg", proc: "trail", fit: "cover" },
+    { id: "trailer_photo", proc: "trailerPhoto", fit: "cover" },
 ];
-
 // Single manifest of available override images (kept clean: one request, no 404 spam).
 export const OVERRIDES_URL = "assets/overrides.json";
-
 // id -> the Phaser texture key that actually got used. Populated by BootScene.
 export const resolved = {};
-
 // Everywhere else in the game, reference art through this so the winning
 // source (photo / AI / procedural) is used transparently.
 export function assetKey(id) {
-  return resolved[id] || id;
+    return resolved[id] || id;
 }

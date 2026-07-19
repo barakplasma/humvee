@@ -6,8 +6,9 @@ Read this before making changes.
 ## What this is
 
 A **mobile-first, browser-based educational game** that teaches how to operate a
-US military **HMMWV "Humvee" A2**. Built for Android Chrome (works on any modern
-browser). It is a **simplified training aid**, not an official manual — every
+US military **HMMWV "Humvee" A2**. Built first for Android Chrome in landscape
+fullscreen, while still working on desktop through keyboard, gamepad, and pointer
+fallbacks. It is a **simplified training aid**, not an official manual — every
 screen carries a disclaimer referencing **TM 9-2320-280-10**. Keep that framing:
 do not present the game as authoritative, and do not add real weapons/ordnance
 operation.
@@ -17,36 +18,46 @@ Live site (GitHub Pages): `https://barakplasma.github.io/humvee/`
 ## Tech + architecture
 
 - **Phaser 4.2.1**, vendored locally at `js/vendor/phaser.min.js` (no CDN, no
-  build step, offline-capable). Loaded as a global `Phaser` in `index.html`.
-- **Vanilla ES modules** for our own code (`<script type="module">`). No bundler,
-  no npm runtime deps. This must stay true — anything requiring a build breaks the
-  "just serve the folder" model and GitHub Pages deploy.
+  runtime CDN, offline-capable). Loaded as a global `Phaser` in `index.html`.
+- **TypeScript source** lives in `src/` and compiles to vanilla ES modules in `js/`
+  with `npm run build`. No bundler and no npm runtime deps. GitHub Pages serves the
+  compiled `js/` tree plus static assets.
+- Use `npm run typecheck:ts7` for the fast TypeScript 7 `tsgo` no-emit check, and
+  keep `npm run build` as the conservative emit path until TS 7 is the only compiler
+  this repo needs.
+- The first migration is intentionally incremental: converted files currently carry
+  `// @ts-nocheck` while the old dynamic Phaser scene fields are typed gradually.
+  Remove that header one file at a time when adding real annotations.
 - **Design resolution:** 1280×720 landscape. Scale mode `FIT` + `CENTER_BOTH`
-  (`js/config.js`). Everything is positioned in this 1280×720 space. A portrait
+  (`src/config.ts`). Everything is positioned in this 1280×720 space. A portrait
   overlay in `index.html`/`css/style.css` nudges phones to landscape.
-- **State:** `localStorage` for progress (`js/data/progress.js`) and language
-  (`js/i18n/i18n.js`). Keys: `humvee.progress`, `humvee.locale`.
+- Product priority is mobile first. Desktop is required and should be polished, but
+  do not optimize layouts, text density, or controls for desktop at the expense of
+  phone landscape/fullscreen play.
+- **State:** `localStorage` for progress (`src/data/progress.ts`) and language
+  (`src/i18n/i18n.ts`). Keys: `humvee.progress`, `humvee.locale`.
 - Debug/test hook: `window.__HUMVEE_GAME__` is the Phaser.Game instance.
 
 ### File map
 ```
 index.html               entry: viewport, Phaser vendor, module entry, rotate hint
 css/style.css            full-screen canvas, portrait hint, no-scroll
-js/theme.js              COLORS, FONT, GAME_WIDTH/HEIGHT constants
-js/config.js             Phaser config + scene registration (add new scenes here)
-js/main.js               boots the game after restoring locale
-js/i18n/                 i18n.js (t, setLocale, isRTL, events) + en.js + he.js
-js/data/controls.js      HMMWV control list (i18n keys + Stage 1 hotspot positions)
-js/data/progress.js      unlock/score persistence; TOTAL_STAGES
-js/assets/manifest.js    replaceable-art registry + assetKey() resolver
-js/ui/DriveControls.js   wheel + tilt + pedals + gear selectors + HUD (driving stages)
-js/ui/Dialog.js          teaching cards, toasts, objective banners, buttons
-js/ui/LangSwitch.js      EN/HE toggle (restarts scene to re-render + flip RTL)
-js/ui/fullscreen.js      addFullscreenButton(scene, x, y)
-js/scenes/BootScene.js   resolves art (override->procedural) + procedural generators
-js/scenes/MenuScene.js   title, stage cards (count-driven layout), lang, fullscreen
-js/scenes/Stage1..8.js plus StageGear/StageObstacle   the ten stages (see below)
-js/scenes/StageCompleteScene.js  score summary + next/menu
+src/theme.ts             COLORS, FONT, GAME_WIDTH/HEIGHT constants
+src/config.ts            Phaser config + scene registration (add new scenes here)
+src/main.ts              boots the game after restoring locale
+src/i18n/                i18n.ts (t, setLocale, isRTL, events) + en.ts + he.ts
+src/data/controls.ts     HMMWV control list (i18n keys + Stage 1 hotspot positions)
+src/data/progress.ts     unlock/score persistence; TOTAL_STAGES
+src/assets/manifest.ts   replaceable-art registry + assetKey() resolver
+src/ui/DriveControls.ts  wheel + tilt + pedals + gear selectors + HUD (driving stages)
+src/ui/Dialog.ts         teaching cards, toasts, objective banners, buttons
+src/ui/LangSwitch.ts     EN/HE toggle (restarts scene to re-render + flip RTL)
+src/ui/fullscreen.ts     addFullscreenButton(scene, x, y)
+src/scenes/BootScene.ts  resolves art (override->procedural) + procedural generators
+src/scenes/MenuScene.ts  title, stage cards (count-driven layout), lang, fullscreen
+src/scenes/Stage1..8.ts plus StageGear/StageObstacle   the ten stages (see below)
+src/scenes/StageCompleteScene.ts  score summary + next/menu
+js/                       compiled TypeScript output loaded by index.html
 assets/photos/           curated real photos (override AI/procedural)
 assets/photos/_album_raw/ gitignored raw Google Photos album dump
 assets/ai/               AI-generated alternates (Gemini via OpenRouter)
@@ -56,11 +67,11 @@ assets/overrides.json    id -> image path map (the only art-wiring file)
 
 ## The ten stages
 
-All stages are directly selectable. Best score per stage is tracked in `progress.js`.
+All stages are directly selectable. Best score per stage is tracked in `src/data/progress.ts`.
 Each stage ends by starting `StageCompleteScene` with `{ stage, score, nextScene }`.
 
 1. **Driver Controls** (`Stage1Scene`) — first-person cockpit (real photo
-   `dashboard_panel`). 12 tappable hotspots (from `js/data/controls.js`) teach each
+   `dashboard_panel`). 12 tappable hotspots (from `src/data/controls.ts`) teach each
    control; positions are **tuned to the shipped cockpit photo's cover-fit layout**.
    After all 12 are reviewed, dismissing the final card starts a guided **start-up
    sequence** checklist (parking brake → N → RUN → wait-to-start glow plugs → START
@@ -116,15 +127,15 @@ heading `ph`. Per frame: `thDot = v/WHEELBASE * tan(steerAngle)`; advance `P` al
 naturally produces "reverse steering is inverted" and jackknifing. Constants at the
 top of the file (`WHEELBASE`, `HITCH`, `TLEN`, `BAY`).
 
-## Controls / input (`js/ui/DriveControls.js`)
+## Controls / input (`src/ui/DriveControls.ts`)
 
 Steering input priority each frame: **keyboard > wheel drag > device tilt > centre**.
 - **Device tilt (primary on phones):** `deviceorientation` → `beta/gamma` chosen by
   `screen.orientation.angle`; neutral captured on first reading; tapping the wheel
   re-centres (`recenterTilt`); iOS gated behind `DeviceOrientationEvent.requestPermission`
   on first pointer. This is the requested main mobile control — keep it working.
-- **Wheel drag** and **keyboard** (arrows/WASD) remain as fallbacks (keyboard also
-  makes headless testing possible).
+- **Wheel drag/thumb swipe** and **keyboard** (arrows/WASD) remain as fallbacks
+  (keyboard also makes headless testing possible).
 - Pedals are hold-to-apply (`throttle`/`brakeInput` ramp). Driving stages with gas
   should call `getDriveSpec()` / `getRpm()` so gear/range choices affect acceleration,
   speed ceiling, load, and RPM consistently.
@@ -186,12 +197,16 @@ Installed official Phaser skills in this repo/session:
 Each lives at `/root/.codex/skills/<skill-name>/SKILL.md`. Read the matching skill
 before changing that Phaser subsystem.
 
-## Fullscreen (`js/ui/fullscreen.js`)
+## Fullscreen (`src/ui/fullscreen.ts`)
 `addFullscreenButton(scene, x, y)` — must be triggered by a pointer gesture (it is).
 Present on the menu and every stage. Entering fullscreen on the menu persists into
 stages (same canvas). Do not call `startFullscreen()` outside an input handler.
 
 ## Pixel 10 / mobile notes
+Mobile landscape/fullscreen is the baseline acceptance target. Desktop browser play is
+required as a secondary target, mainly through keyboard/WASD, gamepad, and pointer
+fallbacks.
+
 Target device: Pixel 10, landscape. We keep 1280×720 `FIT` (letterboxes slightly on
 20:9 — acceptable) plus fullscreen to reclaim browser chrome. Do **not** switch to
 `ENVELOP`/crop or change the base resolution: Stage 1 hotspots and all scene layouts
@@ -199,12 +214,12 @@ are hardcoded to 1280×720, and Stage 1 hotspots are additionally tuned to the c
 photo's cover-fit. Touch targets are large (pedals 120×180, wheel r≈100).
 
 ## Internationalization
-- All user-facing copy lives in `js/i18n/en.js` / `he.js` keyed by id. **Never
+- All user-facing copy lives in `src/i18n/en.ts` / `he.ts` keyed by id. **Never
   hardcode display strings in scenes** — add a key and use `t("key")`. `controls.js`
   stores i18n **keys**, not text.
 - English is the base + fallback for missing keys. Hebrew is **RTL**; `LangSwitch`
   flips `document.dir` and restarts the scene so text re-renders. Add a locale by
-  copying `en.js`, translating, and registering it in `i18n.js` `LOCALES`.
+  copying `en.ts`, translating, and registering it in `i18n.ts` `LOCALES`.
 - System fonts cover Latin + Hebrew (no webfont dependency).
 
 ## Assets pipeline
@@ -226,7 +241,7 @@ procedural fallback** (drawn in `BootScene.gen_*`). One manifest fetch, no 404 s
 - `humvee_topdown` and the Stage 5 `trailer_top` are procedural top-down sprites
   (photos can't provide a top-down orientation).
 - **If you swap `dashboard_panel`**, re-tune Stage 1 hotspot coords in
-  `js/data/controls.js` to the new framing (they are cover-fit dependent).
+  `src/data/controls.ts` to the new framing (they are cover-fit dependent).
   Prefer adding closeup photos to `Dialog.showCard({ imageKey })` over replacing the
   overview map.
 
@@ -255,8 +270,9 @@ once (Settings → Pages → Source: GitHub Actions); the workflow sets
 private repo — it worked after the repo was made public + Pages enabled.
 
 ## Conventions / gotchas
-- Keep it buildless and dependency-free at runtime.
-- Add new scenes to `js/config.js` **and** wire unlock flow (`nextScene` +
+- Keep it dependency-free at runtime: compile TypeScript before serving or deploying,
+  but do not add a bundler or runtime npm package.
+- Add new scenes to `src/config.ts` **and** wire unlock flow (`nextScene` +
   `TOTAL_STAGES`). Menu cards are count-driven (width auto-scales).
 - Top-down heading convention everywhere: texture points up; forward =
   `(sinθ, -cosθ)`; `sprite.rotation = θ`. Side view (Stage 4) tilts by terrain slope.

@@ -1,0 +1,16 @@
+{
+  "name": "humvee-a2-driver-trainer",
+  "version": "1.2.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck:ts7": "tsgo --noEmit -p tsconfig.json",
+    "check": "npm run typecheck && npm run typecheck:ts7"
+  },
+  "devDependencies": {
+    "@typescript/native-preview": "7.0.0-dev.20260707.2",
+    "typescript": "^5.9.2"
+  }
+}
