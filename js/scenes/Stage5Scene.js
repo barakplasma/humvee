@@ -121,11 +121,38 @@ export default class Stage5Scene extends Phaser.Scene {
         })
         .setOrigin(0.5)
     );
-    const btn = this.dialog.makeButton(GAME_WIDTH / 2, 600, t("btn_begin"), () => {
+    const bx = GAME_WIDTH / 2;
+    const by = 600;
+    const bw = 240;
+    const bh = 56;
+    const btnBg = this.add
+      .rectangle(bx, by, bw, bh, COLORS.armyGreen, 1)
+      .setStrokeStyle(2, COLORS.sand)
+      .setScrollFactor(0)
+      .setDepth(3001)
+      .setInteractive({ useHandCursor: true });
+    const btnLabel = this.add
+      .text(bx, by, t("btn_begin"), {
+        fontFamily: FONT,
+        fontSize: "24px",
+        color: "#f2ecd8",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(3002);
+    btnBg.on("pointerover", () => btnBg.setFillStyle(COLORS.panelLight, 1));
+    btnBg.on("pointerout", () => btnBg.setFillStyle(COLORS.armyGreen, 1));
+    btnBg.on("pointerdown", () => {
+      btnBg.setScale(0.96);
+      btnLabel.setScale(0.96);
+    });
+    btnBg.on("pointerup", () => {
       cont.destroy();
+      btnBg.destroy();
+      btnLabel.destroy();
       this.startPlay();
     });
-    cont.add(btn);
   }
 
   startPlay() {

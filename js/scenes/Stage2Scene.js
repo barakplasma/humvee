@@ -143,7 +143,7 @@ export default class Stage2Scene extends Phaser.Scene {
 
     const onRoad = this.isOnRoad(this.vehicle.x, this.vehicle.y);
     if (!onRoad) {
-      this.speed -= 400 * dt; // heavy drag off-road
+      this.speed -= 160 * dt; // heavy drag off-road, but still recoverable under throttle
       if (!this._offroadWarn) {
         this._offroadWarn = true;
         this.dialog.toast(t("s2_offroad"), { color: "#d8a54a", duration: 1200 });
