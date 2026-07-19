@@ -34,9 +34,11 @@ export const en = {
   stage4_blurb: "Slopes, side-slopes, traction loss and fording.",
   stage5_title: "Trailer Parking",
   stage5_blurb: "Reverse the water trailer into the bay.",
+  best_score: "Best: {score}",
+  no_score: "No score yet",
   stage_locked_msg: "Finish the previous stage to unlock this one.",
-  progress_reset: "Reset progress",
-  progress_reset_confirm: "Reset all progress?",
+  progress_reset: "Reset scores",
+  progress_reset_confirm: "Reset all scores?",
 
   // ---- Stage complete ----
   stage_complete: "Stage Complete!",
@@ -44,7 +46,7 @@ export const en = {
   score: "Score: {score}",
   btn_next_stage: "Next Stage",
   all_complete_title: "Training Complete",
-  all_complete_msg: "You have completed all four stages. Outstanding.",
+  all_complete_msg: "You have completed all five stages. Outstanding.",
 
   // ---- Controls (names + teaching text), used by Stage 1 tour ----
   ctrl_tour_intro:

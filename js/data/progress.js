@@ -1,4 +1,4 @@
-// Tracks which stages are unlocked and best scores, in localStorage.
+// Tracks best scores in localStorage. `unlocked` is kept only for older saves.
 const KEY = "humvee.progress";
 const TOTAL_STAGES = 5;
 
@@ -9,7 +9,7 @@ function load() {
   } catch (_) {
     /* ignore */
   }
-  return { unlocked: 1, scores: {} };
+  return { unlocked: TOTAL_STAGES, scores: {} };
 }
 
 function save(state) {
@@ -30,9 +30,7 @@ export function isUnlocked(stage) {
 
 export function completeStage(stage, score = 0) {
   const state = load();
-  if (stage + 1 > state.unlocked && stage < TOTAL_STAGES) {
-    state.unlocked = stage + 1;
-  }
+  state.unlocked = TOTAL_STAGES;
   const prev = state.scores[stage] || 0;
   state.scores[stage] = Math.max(prev, score);
   save(state);
@@ -45,11 +43,11 @@ export function getScore(stage) {
 
 export function allComplete() {
   const state = load();
-  return state.unlocked > TOTAL_STAGES;
+  return Array.from({ length: TOTAL_STAGES }, (_, i) => String(i + 1)).every((stage) => state.scores[stage] > 0);
 }
 
 export function reset() {
-  save({ unlocked: 1, scores: {} });
+  save({ unlocked: TOTAL_STAGES, scores: {} });
 }
 
 export { TOTAL_STAGES };

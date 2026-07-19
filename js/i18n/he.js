@@ -34,9 +34,11 @@ export const he = {
   stage4_blurb: "מדרונות, שיפועים צדדיים, אובדן אחיזה וחציית מים.",
   stage5_title: "חניית נגרר",
   stage5_blurb: "החזירו את נגרר המים אל התא בנסיעה לאחור.",
+  best_score: "שיא: {score}",
+  no_score: "אין ניקוד עדיין",
   stage_locked_msg: "סיימו את השלב הקודם כדי לפתוח את זה.",
-  progress_reset: "איפוס התקדמות",
-  progress_reset_confirm: "לאפס את כל ההתקדמות?",
+  progress_reset: "איפוס ניקוד",
+  progress_reset_confirm: "לאפס את כל הניקוד?",
 
   // ---- Stage complete ----
   stage_complete: "השלב הושלם!",
@@ -44,7 +46,7 @@ export const he = {
   score: "ניקוד: {score}",
   btn_next_stage: "השלב הבא",
   all_complete_title: "האימון הושלם",
-  all_complete_msg: "השלמתם את כל ארבעת השלבים. מצוין.",
+  all_complete_msg: "השלמתם את כל חמשת השלבים. מצוין.",
 
   // ---- Controls ----
   ctrl_tour_intro: "הקישו על כל בקרה מודגשת כדי ללמוד מה היא עושה. למדו את כולן כדי להמשיך.",

@@ -1,7 +1,7 @@
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONT } from "../theme.js";
 import { t } from "../i18n/i18n.js";
 import { assetKey } from "../assets/manifest.js";
-import { isUnlocked, reset, allComplete } from "../data/progress.js";
+import { getScore, reset, allComplete } from "../data/progress.js";
 import Dialog from "../ui/Dialog.js";
 import LangSwitch from "../ui/LangSwitch.js";
 import { addFullscreenButton } from "../ui/fullscreen.js";
@@ -95,12 +95,12 @@ export default class MenuScene extends Phaser.Scene {
   }
 
   makeStageCard(x, y, w, st) {
-    const unlocked = isUnlocked(st.n);
+    const score = getScore(st.n);
     const h = 260;
     const cont = this.add.container(x, y);
     const bg = this.add
-      .rectangle(0, 0, w, h, COLORS.panel, unlocked ? 0.95 : 0.7)
-      .setStrokeStyle(3, unlocked ? COLORS.sand : COLORS.sandDark)
+      .rectangle(0, 0, w, h, COLORS.panel, 0.95)
+      .setStrokeStyle(3, COLORS.sand)
       .setInteractive({ useHandCursor: true });
     cont.add(bg);
 
@@ -119,7 +119,7 @@ export default class MenuScene extends Phaser.Scene {
         .text(0, -h / 2 + 74, t(st.titleKey), {
           fontFamily: FONT,
           fontSize: "23px",
-          color: unlocked ? "#f2ecd8" : "#9c8f68",
+          color: "#f2ecd8",
           fontStyle: "bold",
           align: "center",
           wordWrap: { width: w - 24 },
@@ -131,40 +131,36 @@ export default class MenuScene extends Phaser.Scene {
         .text(0, 24, t(st.blurbKey), {
           fontFamily: FONT,
           fontSize: "16px",
-          color: unlocked ? "#c9b98f" : "#7d7355",
+          color: "#c9b98f",
           align: "center",
           wordWrap: { width: w - 26 },
         })
         .setOrigin(0.5)
     );
 
-    if (unlocked) {
-      cont.add(
-        this.add
-          .text(0, h / 2 - 34, "▶ " + t("btn_begin"), {
-            fontFamily: FONT,
-            fontSize: "22px",
-            color: "#6fbf5a",
-            fontStyle: "bold",
-          })
-          .setOrigin(0.5)
-      );
-    } else {
-      cont.add(
-        this.add
-          .text(0, h / 2 - 34, "🔒 " + t("locked"), {
-            fontFamily: FONT,
-            fontSize: "20px",
-            color: "#9c8f68",
-          })
-          .setOrigin(0.5)
-      );
-    }
+    cont.add(
+      this.add
+        .text(0, h / 2 - 62, score ? t("best_score", { score }) : t("no_score"), {
+          fontFamily: FONT,
+          fontSize: "17px",
+          color: score ? "#d8a54a" : "#9c8f68",
+          fontStyle: "bold",
+        })
+        .setOrigin(0.5)
+    );
 
-    bg.on("pointerup", () => {
-      if (unlocked) this.scene.start(st.scene);
-      else this.dialog.toast(t("stage_locked_msg"), { color: "#d8a54a" });
-    });
+    cont.add(
+      this.add
+        .text(0, h / 2 - 28, "▶ " + t("btn_begin"), {
+          fontFamily: FONT,
+          fontSize: "22px",
+          color: "#6fbf5a",
+          fontStyle: "bold",
+        })
+        .setOrigin(0.5)
+    );
+
+    bg.on("pointerup", () => this.scene.start(st.scene));
   }
 }
 
