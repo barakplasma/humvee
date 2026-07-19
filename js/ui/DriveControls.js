@@ -23,12 +23,21 @@ export default class DriveControls {
     this._brakeHeld = false;
     this._dragSteer = 0;
     this._dragPointerId = null;
+    this._pointerMoveHandler = null;
+    this._pointerUpHandler = null;
 
     // Device-tilt steering state (primary control on phones).
     this._tiltActive = false;
     this._tiltSteer = 0;
     this._tiltNeutral = null;
     this._rawTilt = 0;
+    this._tiltPermissionHandler = null;
+
+    // Gamepad steering state. Phaser exposes the same leftStick/buttons API in
+    // Phaser 3.87 and Phaser 4, matching the Labs gamepad debug sample.
+    this._gamepad = null;
+    this._gamepadConnectedHandler = null;
+    this._gamepadDisconnectedHandler = null;
 
     this.container = scene.add.container(0, 0).setDepth(600);
 
@@ -38,6 +47,9 @@ export default class DriveControls {
     this.buildHUD();
     this.bindKeyboard();
     this.bindTilt();
+    this.bindGamepad();
+
+    scene.events.once("shutdown", () => this.destroy());
   }
 
   // ---- Steering wheel (bottom-left) ----
@@ -63,14 +75,15 @@ export default class DriveControls {
       this.recenterTilt(); // tapping the wheel re-centres tilt steering
       this.updateSteerFromPointer(p);
     });
-    s.input.on("pointermove", (p) => {
+    this._pointerMoveHandler = (p) => {
       if (this._dragPointerId === p.id) this.updateSteerFromPointer(p);
-    });
-    const release = (p) => {
+    };
+    s.input.on("pointermove", this._pointerMoveHandler);
+    this._pointerUpHandler = (p) => {
       if (this._dragPointerId === p.id) this._dragPointerId = null;
     };
-    s.input.on("pointerup", release);
-    s.input.on("pointerupoutside", release);
+    s.input.on("pointerup", this._pointerUpHandler);
+    s.input.on("pointerupoutside", this._pointerUpHandler);
 
     // Hint (useful on phones; harmless elsewhere).
     this.tiltHint = s.add
@@ -307,10 +320,12 @@ export default class DriveControls {
       // iOS: needs a user gesture to grant motion access.
       const once = () => {
         this.scene.input.off("pointerdown", once);
+        this._tiltPermissionHandler = null;
         DOE.requestPermission()
-          .then((r) => r === "granted" && start())
+          .then((r) => r === "granted" && !this._destroyed && start())
           .catch(() => {});
       };
+      this._tiltPermissionHandler = once;
       this.scene.input.on("pointerdown", once);
     } else {
       start();
@@ -321,12 +336,74 @@ export default class DriveControls {
     if (this._tiltActive) this._tiltNeutral = this._rawTilt;
   }
 
+  // ---- Gamepad (desktop / controllers) ----
+  bindGamepad() {
+    const plugin = this.scene.input.gamepad;
+    if (!plugin) return;
+
+    this._gamepad = this.getActiveGamepad();
+    if (this._gamepad && this._gamepad.setAxisThreshold) this._gamepad.setAxisThreshold(0.12);
+
+    this._gamepadConnectedHandler = (pad) => {
+      this._gamepad = pad;
+      if (pad && pad.setAxisThreshold) pad.setAxisThreshold(0.12);
+    };
+    this._gamepadDisconnectedHandler = (pad) => {
+      if (this._gamepad === pad) this._gamepad = this.getActiveGamepad(pad);
+    };
+
+    plugin.on("connected", this._gamepadConnectedHandler);
+    plugin.on("disconnected", this._gamepadDisconnectedHandler);
+  }
+
+  getActiveGamepad(excludePad = null) {
+    const plugin = this.scene.input.gamepad;
+    if (!plugin) return null;
+    let pads = plugin.getAll ? plugin.getAll() : [];
+    if (!pads.length) pads = [plugin.pad1, plugin.pad2, plugin.pad3, plugin.pad4].filter(Boolean);
+    if (!pads.length && plugin.gamepads) pads = plugin.gamepads;
+    return pads.find((pad) => pad && pad !== excludePad && pad.connected !== false) || null;
+  }
+
+  getGamepadState() {
+    const pad = this._gamepad && this._gamepad.connected !== false ? this._gamepad : this.getActiveGamepad();
+    this._gamepad = pad;
+    if (!pad) return { steer: 0, gas: false, brake: false };
+
+    const leftX =
+      (pad.leftStick && Number.isFinite(pad.leftStick.x) && pad.leftStick.x) ||
+      this.getGamepadAxisValue(pad, 0);
+    const steer = Phaser.Math.Clamp(Math.abs(leftX) < 0.12 ? 0 : leftX, -1, 1);
+
+    const gasValue = Math.max(this.getGamepadButtonValue(pad, 7), this.getGamepadButtonValue(pad, 0));
+    const brakeValue = Math.max(this.getGamepadButtonValue(pad, 6), this.getGamepadButtonValue(pad, 1));
+    const gas = gasValue > 0.25 || pad.up === true;
+    const brake = brakeValue > 0.25 || pad.down === true;
+
+    return { steer, gas, brake };
+  }
+
+  getGamepadAxisValue(pad, index) {
+    if (!pad.getAxisValue) return 0;
+    if (pad.getAxisTotal && index >= pad.getAxisTotal()) return 0;
+    return pad.getAxisValue(index) || 0;
+  }
+
+  getGamepadButtonValue(pad, index) {
+    if (pad.getButtonTotal && index >= pad.getButtonTotal()) return 0;
+    if (pad.getButtonValue) return pad.getButtonValue(index) || 0;
+    const button = pad.buttons && pad.buttons[index];
+    if (!button) return 0;
+    return typeof button.value === "number" ? button.value : button.pressed ? 1 : 0;
+  }
+
   // ---- Per-frame update ----
   update(dtMs) {
     const dt = dtMs / 1000;
     const k = this.keys;
+    const gp = this.getGamepadState();
 
-    // Steering priority: keyboard > wheel drag > device tilt > centre.
+    // Steering priority: keyboard > wheel drag > gamepad stick > device tilt > centre.
     let kbSteer = 0;
     if (k) {
       if (k.left.isDown || k.a.isDown) kbSteer -= 1;
@@ -335,6 +412,7 @@ export default class DriveControls {
     let target;
     if (kbSteer !== 0) target = kbSteer;
     else if (this._dragPointerId !== null) target = this._dragSteer;
+    else if (gp.steer !== 0) target = gp.steer;
     else if (this._tiltActive) target = this._tiltSteer;
     else target = 0;
 
@@ -344,13 +422,27 @@ export default class DriveControls {
     this.drawWheel(this.steer);
 
     // Pedals (button hold or keyboard).
-    const gas = this._gasHeld || (k && (k.up.isDown || k.w.isDown));
-    const brake = this._brakeHeld || (k && (k.down.isDown || k.s.isDown));
+    const gas = this._gasHeld || gp.gas || (k && (k.up.isDown || k.w.isDown));
+    const brake = this._brakeHeld || gp.brake || (k && (k.down.isDown || k.s.isDown));
     this.throttle = Phaser.Math.Clamp(this.throttle + (gas ? dt * 2 : -dt * 3), 0, 1);
     this.brakeInput = Phaser.Math.Clamp(this.brakeInput + (brake ? dt * 4 : -dt * 5), 0, 1);
   }
 
   destroy() {
+    if (this._destroyed) return;
+    this._destroyed = true;
+    if (this._pointerMoveHandler) this.scene.input.off("pointermove", this._pointerMoveHandler);
+    if (this._pointerUpHandler) {
+      this.scene.input.off("pointerup", this._pointerUpHandler);
+      this.scene.input.off("pointerupoutside", this._pointerUpHandler);
+    }
+    if (this._tiltPermissionHandler) this.scene.input.off("pointerdown", this._tiltPermissionHandler);
+    if (this._gamepadConnectedHandler && this.scene.input.gamepad) {
+      this.scene.input.gamepad.off("connected", this._gamepadConnectedHandler);
+    }
+    if (this._gamepadDisconnectedHandler && this.scene.input.gamepad) {
+      this.scene.input.gamepad.off("disconnected", this._gamepadDisconnectedHandler);
+    }
     if (this._tiltHandler) window.removeEventListener("deviceorientation", this._tiltHandler, true);
     this.container.destroy();
   }

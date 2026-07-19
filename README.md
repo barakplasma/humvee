@@ -25,7 +25,8 @@ browser) that teaches how to operate a **US military HMMWV "Humvee" A2**. Built 
 ## Controls
 
 On a phone, **tilt to steer** (tap the wheel to re-centre); on desktop use the arrow
-keys / WASD or drag the on-screen wheel. Gas/brake are the on-screen pedals. A
+keys / WASD, a connected gamepad's left stick and triggers, or drag the on-screen wheel.
+Gas/brake are the on-screen pedals. A
 **fullscreen** button (⛶) is on the menu and every stage — best experienced
 fullscreen in landscape.
 

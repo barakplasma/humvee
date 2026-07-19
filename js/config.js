@@ -19,8 +19,8 @@ export function createConfig() {
       width: GAME_WIDTH,
       height: GAME_HEIGHT,
     },
-    // Multi-touch: allow up to 3 pointers so steering + pedal can be pressed together.
-    input: { activePointers: 3 },
+    // Multi-touch allows steering + pedal together; gamepad enables stick/trigger driving.
+    input: { activePointers: 3, gamepad: true },
     physics: {
       default: "arcade",
       arcade: { debug: false },
