@@ -14,6 +14,7 @@ export const ASSETS = [
   { id: "humvee_topdown", proc: "humveeTop", fit: "contain" },
   { id: "humvee_side", proc: "humveeSide", fit: "contain" },
   { id: "trail_bg", proc: "trail", fit: "cover" },
+  { id: "trailer_photo", proc: "trailerPhoto", fit: "cover" },
 ];
 
 // Single manifest of available override images (kept clean: one request, no 404 spam).

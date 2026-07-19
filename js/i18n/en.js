@@ -15,6 +15,8 @@ export const en = {
   btn_got_it: "Got it",
   btn_begin: "Begin",
   tap_to_continue: "Tap to continue",
+  tilt_hint: "Tilt phone to steer • tap wheel to re-centre",
+  fullscreen: "Fullscreen",
   locked: "Locked",
   objective: "Objective",
   language: "Language",
@@ -30,6 +32,8 @@ export const en = {
   stage3_blurb: "Master the transfer case and gear ranges.",
   stage4_title: "Technical Off-Road",
   stage4_blurb: "Slopes, side-slopes, traction loss and fording.",
+  stage5_title: "Trailer Parking",
+  stage5_blurb: "Reverse the water trailer into the bay.",
   stage_locked_msg: "Finish the previous stage to unlock this one.",
   progress_reset: "Reset progress",
   progress_reset_confirm: "Reset all progress?",
@@ -144,4 +148,15 @@ export const en = {
   s4_stalled: "Stalled on the obstacle. Use low range and momentum.",
   s4_flooded: "You stopped in the water and flooded the engine. Keep steady next time.",
   s4_complete: "Course cleared. Expert-level driving!",
+
+  // ---- Stage 5 trailer parking ----
+  s5_intro_title: "Water Trailer (M149)",
+  s5_intro_body:
+    "You're towing a 400-gallon water trailer. When REVERSING, the trailer swings the OPPOSITE way to the steering wheel — go slow and make small corrections. Pull forward to straighten out if it jackknifes.",
+  s5_obj: "Park the water trailer inside the marked bay, straight and stopped.",
+  s5_hint_reverse: "Select R and back the trailer into the bay. Steering is reversed when backing.",
+  s5_align: "Line the trailer up straight with the bay.",
+  s5_jackknife: "Jackknifing! Pull forward (D) to straighten the trailer.",
+  s5_inbay: "In the bay — straighten up and stop.",
+  s5_parked: "Trailer parked in the perfect spot. Outstanding!",
 };

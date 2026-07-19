@@ -4,12 +4,14 @@ import { assetKey } from "../assets/manifest.js";
 import { isUnlocked, reset, allComplete } from "../data/progress.js";
 import Dialog from "../ui/Dialog.js";
 import LangSwitch from "../ui/LangSwitch.js";
+import { addFullscreenButton } from "../ui/fullscreen.js";
 
 const STAGES = [
   { n: 1, titleKey: "stage1_title", blurbKey: "stage1_blurb", scene: "Stage1Scene" },
   { n: 2, titleKey: "stage2_title", blurbKey: "stage2_blurb", scene: "Stage2Scene" },
   { n: 3, titleKey: "stage3_title", blurbKey: "stage3_blurb", scene: "Stage3Scene" },
   { n: 4, titleKey: "stage4_title", blurbKey: "stage4_blurb", scene: "Stage4Scene" },
+  { n: 5, titleKey: "stage5_title", blurbKey: "stage5_blurb", scene: "Stage5Scene" },
 ];
 
 export default class MenuScene extends Phaser.Scene {
@@ -48,11 +50,12 @@ export default class MenuScene extends Phaser.Scene {
     // Language switch (restart scene so everything re-renders in the new direction).
     new LangSwitch(this, 24, 34, () => this.scene.restart());
 
-    // Stage cards.
-    const cardW = 270;
-    const gap = 24;
-    const totalW = STAGES.length * cardW + (STAGES.length - 1) * gap;
-    let x = (GAME_WIDTH - totalW) / 2 + cardW / 2;
+    // Stage cards (width scales to the number of stages).
+    const gap = 18;
+    const margin = 28;
+    const n = STAGES.length;
+    const cardW = Math.floor((GAME_WIDTH - margin * 2 - gap * (n - 1)) / n);
+    let x = margin + cardW / 2;
     const y = 380;
     STAGES.forEach((st) => {
       this.makeStageCard(x, y, cardW, st);
@@ -84,6 +87,8 @@ export default class MenuScene extends Phaser.Scene {
       this.scene.restart();
     });
 
+    addFullscreenButton(this, GAME_WIDTH - 24, 58);
+
     if (allComplete()) {
       this.dialog.toast(t("all_complete_msg"), { color: "#6fbf5a", duration: 3000 });
     }
@@ -111,24 +116,24 @@ export default class MenuScene extends Phaser.Scene {
     );
     cont.add(
       this.add
-        .text(0, -h / 2 + 78, t(st.titleKey), {
+        .text(0, -h / 2 + 74, t(st.titleKey), {
           fontFamily: FONT,
-          fontSize: "26px",
+          fontSize: "23px",
           color: unlocked ? "#f2ecd8" : "#9c8f68",
           fontStyle: "bold",
           align: "center",
-          wordWrap: { width: w - 30 },
+          wordWrap: { width: w - 24 },
         })
         .setOrigin(0.5)
     );
     cont.add(
       this.add
-        .text(0, 20, t(st.blurbKey), {
+        .text(0, 24, t(st.blurbKey), {
           fontFamily: FONT,
-          fontSize: "18px",
+          fontSize: "16px",
           color: unlocked ? "#c9b98f" : "#7d7355",
           align: "center",
-          wordWrap: { width: w - 40 },
+          wordWrap: { width: w - 26 },
         })
         .setOrigin(0.5)
     );

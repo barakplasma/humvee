@@ -1,6 +1,6 @@
 // Tracks which stages are unlocked and best scores, in localStorage.
 const KEY = "humvee.progress";
-const TOTAL_STAGES = 4;
+const TOTAL_STAGES = 5;
 
 function load() {
   try {

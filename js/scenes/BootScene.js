@@ -144,6 +144,28 @@ export default class BootScene extends Phaser.Scene {
     g.destroy();
   }
 
+  gen_trailerPhoto(key) {
+    const w = 640;
+    const h = 400;
+    const g = this.add.graphics();
+    g.fillStyle(0x6b7360, 1);
+    g.fillRect(0, 0, w, h); // yard
+    g.fillStyle(0x8a7a4e, 1);
+    g.fillRoundedRect(180, 150, 300, 120, 16); // tank body
+    g.fillStyle(0x746643, 1);
+    g.fillRoundedRect(210, 165, 90, 40, 8);
+    g.fillStyle(0x141414, 1);
+    g.fillCircle(250, 285, 34);
+    g.fillCircle(410, 285, 34);
+    g.lineStyle(10, 0x3a3a2a, 1);
+    g.beginPath();
+    g.moveTo(180, 210);
+    g.lineTo(90, 250);
+    g.strokePath(); // drawbar
+    g.generateTexture(key, w, h);
+    g.destroy();
+  }
+
   gen_trail(key) {
     const s = 256;
     const g = this.add.graphics();

@@ -21,8 +21,14 @@ export default class DriveControls {
 
     this._gasHeld = false;
     this._brakeHeld = false;
-    this._steerTarget = 0;
+    this._dragSteer = 0;
     this._dragPointerId = null;
+
+    // Device-tilt steering state (primary control on phones).
+    this._tiltActive = false;
+    this._tiltSteer = 0;
+    this._tiltNeutral = null;
+    this._rawTilt = 0;
 
     this.container = scene.add.container(0, 0).setDepth(600);
 
@@ -31,6 +37,7 @@ export default class DriveControls {
     if (opts.selectors) this.buildSelectors();
     this.buildHUD();
     this.bindKeyboard();
+    this.bindTilt();
   }
 
   // ---- Steering wheel (bottom-left) ----
@@ -53,6 +60,7 @@ export default class DriveControls {
 
     zone.on("pointerdown", (p) => {
       this._dragPointerId = p.id;
+      this.recenterTilt(); // tapping the wheel re-centres tilt steering
       this.updateSteerFromPointer(p);
     });
     s.input.on("pointermove", (p) => {
@@ -63,11 +71,23 @@ export default class DriveControls {
     };
     s.input.on("pointerup", release);
     s.input.on("pointerupoutside", release);
+
+    // Hint (useful on phones; harmless elsewhere).
+    this.tiltHint = s.add
+      .text(this.wheelX, this.wheelY + this.wheelR + 26, t("tilt_hint"), {
+        fontFamily: FONT,
+        fontSize: "15px",
+        color: "#c9b98f",
+        align: "center",
+      })
+      .setOrigin(0.5)
+      .setDepth(600);
+    this.container.add(this.tiltHint);
   }
 
   updateSteerFromPointer(p) {
     const dx = p.x - this.wheelX;
-    this._steerTarget = Phaser.Math.Clamp(dx / this.wheelR, -1, 1);
+    this._dragSteer = Phaser.Math.Clamp(dx / this.wheelR, -1, 1);
   }
 
   drawWheel(steer) {
@@ -261,22 +281,65 @@ export default class DriveControls {
     });
   }
 
+  // ---- Device-tilt steering (phones) ----
+  bindTilt() {
+    if (typeof window === "undefined" || !window.DeviceOrientationEvent) return;
+    const handler = (e) => {
+      if (e.beta === null && e.gamma === null) return;
+      const angle =
+        (typeof screen !== "undefined" && screen.orientation && screen.orientation.angle) ||
+        window.orientation ||
+        0;
+      let tilt;
+      if (angle === 90) tilt = -(e.beta || 0);
+      else if (angle === 270 || angle === -90) tilt = e.beta || 0;
+      else tilt = e.gamma || 0; // portrait / default
+      this._rawTilt = tilt;
+      if (this._tiltNeutral === null) this._tiltNeutral = tilt;
+      const MAX_DEG = 22;
+      this._tiltSteer = Phaser.Math.Clamp((tilt - this._tiltNeutral) / MAX_DEG, -1, 1);
+      this._tiltActive = true;
+    };
+    this._tiltHandler = handler;
+    const start = () => window.addEventListener("deviceorientation", handler, true);
+    const DOE = window.DeviceOrientationEvent;
+    if (DOE && typeof DOE.requestPermission === "function") {
+      // iOS: needs a user gesture to grant motion access.
+      const once = () => {
+        this.scene.input.off("pointerdown", once);
+        DOE.requestPermission()
+          .then((r) => r === "granted" && start())
+          .catch(() => {});
+      };
+      this.scene.input.on("pointerdown", once);
+    } else {
+      start();
+    }
+  }
+
+  recenterTilt() {
+    if (this._tiltActive) this._tiltNeutral = this._rawTilt;
+  }
+
   // ---- Per-frame update ----
   update(dtMs) {
     const dt = dtMs / 1000;
     const k = this.keys;
 
-    // Keyboard steering overrides drag target.
+    // Steering priority: keyboard > wheel drag > device tilt > centre.
     let kbSteer = 0;
     if (k) {
       if (k.left.isDown || k.a.isDown) kbSteer -= 1;
       if (k.right.isDown || k.d.isDown) kbSteer += 1;
     }
-    if (kbSteer !== 0) this._steerTarget = kbSteer;
-    else if (this._dragPointerId === null) this._steerTarget = 0; // auto-centre
+    let target;
+    if (kbSteer !== 0) target = kbSteer;
+    else if (this._dragPointerId !== null) target = this._dragSteer;
+    else if (this._tiltActive) target = this._tiltSteer;
+    else target = 0;
 
     // Ease steering toward target.
-    this.steer = Phaser.Math.Linear(this.steer, this._steerTarget, Math.min(1, dt * 8));
+    this.steer = Phaser.Math.Linear(this.steer, target, Math.min(1, dt * 8));
     if (Math.abs(this.steer) < 0.01) this.steer = 0;
     this.drawWheel(this.steer);
 
@@ -288,6 +351,7 @@ export default class DriveControls {
   }
 
   destroy() {
+    if (this._tiltHandler) window.removeEventListener("deviceorientation", this._tiltHandler, true);
     this.container.destroy();
   }
 }

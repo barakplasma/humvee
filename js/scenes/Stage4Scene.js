@@ -3,6 +3,7 @@ import { t } from "../i18n/i18n.js";
 import { assetKey } from "../assets/manifest.js";
 import Dialog from "../ui/Dialog.js";
 import DriveControls from "../ui/DriveControls.js";
+import { addFullscreenButton } from "../ui/fullscreen.js";
 
 const WORLD_W = 4650;
 const START_X = 700; // spawn with camera headroom + runway before the first obstacle
@@ -70,6 +71,7 @@ export default class Stage4Scene extends Phaser.Scene {
     this.buildIndicators();
     this.banner = this.dialog.banner(t("s4_obj"));
     this.makeBackButton();
+    addFullscreenButton(this, this.scale.width - 132, 20);
 
     // Finish flag.
     this.finishX = 4480;
@@ -286,7 +288,7 @@ export default class Stage4Scene extends Phaser.Scene {
     this.dialog.toast(t("s4_complete"), { color: "#6fbf5a", duration: 2000 });
     const score = Math.max(0, 100 - this.penalty);
     this.time.delayedCall(1600, () =>
-      this.scene.start("StageCompleteScene", { stage: 4, score, nextScene: null })
+      this.scene.start("StageCompleteScene", { stage: 4, score, nextScene: "Stage5Scene" })
     );
   }
 }

@@ -19,6 +19,15 @@ browser) that teaches how to operate a **US military HMMWV "Humvee" A2**. Built 
    **transmission** (`P / R / N / OD / D / 2 / 1`) against terrain scenarios.
 4. **Technical Off-Road** — slopes, side-slopes, traction loss (3-wheel), and water
    fording, using the techniques from Stage 3.
+5. **Trailer Parking** — hitch up and reverse an M149 water trailer into a marked
+   bay (articulated trailer physics; reverse steering is inverted).
+
+## Controls
+
+On a phone, **tilt to steer** (tap the wheel to re-centre); on desktop use the arrow
+keys / WASD or drag the on-screen wheel. Gas/brake are the on-screen pedals. A
+**fullscreen** button (⛶) is on the menu and every stage — best experienced
+fullscreen in landscape.
 
 ## Languages
 

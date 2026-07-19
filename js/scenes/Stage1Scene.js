@@ -3,6 +3,7 @@ import { t } from "../i18n/i18n.js";
 import { assetKey } from "../assets/manifest.js";
 import { CONTROLS } from "../data/controls.js";
 import Dialog from "../ui/Dialog.js";
+import { addFullscreenButton } from "../ui/fullscreen.js";
 import { fitCover } from "./MenuScene.js";
 
 const STARTUP_STEPS = [
@@ -30,6 +31,7 @@ export default class Stage1Scene extends Phaser.Scene {
 
     this.banner = this.dialog.banner(t("ctrl_tour_intro"));
     this.makeBackButton();
+    addFullscreenButton(this, GAME_WIDTH - 24, 18);
 
     this.progressText = this.add
       .text(GAME_WIDTH / 2, 30, "", { fontFamily: FONT, fontSize: "22px", color: "#d8a54a", fontStyle: "bold" })

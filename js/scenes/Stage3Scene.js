@@ -3,6 +3,7 @@ import { t } from "../i18n/i18n.js";
 import { assetKey } from "../assets/manifest.js";
 import Dialog from "../ui/Dialog.js";
 import DriveControls from "../ui/DriveControls.js";
+import { addFullscreenButton } from "../ui/fullscreen.js";
 
 const WORLD_W = 1000;
 const WORLD_H = 2600;
@@ -80,6 +81,7 @@ export default class Stage3Scene extends Phaser.Scene {
 
     this.banner = this.dialog.banner(t("s3_obj"));
     this.makeBackButton();
+    addFullscreenButton(this, this.scale.width - 132, 20);
     this.showGatePrompt();
   }
 

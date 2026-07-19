@@ -3,6 +3,7 @@ import { t } from "../i18n/i18n.js";
 import { assetKey } from "../assets/manifest.js";
 import Dialog from "../ui/Dialog.js";
 import DriveControls from "../ui/DriveControls.js";
+import { addFullscreenButton } from "../ui/fullscreen.js";
 
 const WORLD_W = 2000;
 const WORLD_H = 1500;
@@ -61,6 +62,7 @@ export default class Stage2Scene extends Phaser.Scene {
     this.banner = this.dialog.banner(t("s2_obj"));
     this.dialog.toast(t("s2_reminder_drive"), { color: "#c9b98f", duration: 2600 });
     this.makeBackButton();
+    addFullscreenButton(this, this.scale.width - 132, 20);
   }
 
   drawRoads() {
