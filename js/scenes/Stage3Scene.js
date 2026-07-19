@@ -9,6 +9,8 @@ const WORLD_W = 1000;
 const WORLD_H = 2600;
 const TRAIL_X = 500;
 const TRAIL_HALF = 180;
+const WHEELBASE = 115;
+const MAX_STEER_ANGLE = 0.5;
 
 export default class Stage3Scene extends Phaser.Scene {
   constructor() {
@@ -159,9 +161,13 @@ export default class Stage3Scene extends Phaser.Scene {
     const onTrail = this.onTrail(this.vehicle.x);
     this.speed = Phaser.Math.Clamp(this.speed, 0, onTrail ? maxSpeed : 90);
 
-    // Steering.
-    const steerFactor = 0.4 + 0.6 * Phaser.Math.Clamp(this.speed / 180, 0, 1);
-    this.vehicle.rotation += this.dc.steer * 2.2 * steerFactor * dt * dir;
+    // Kinematic bicycle steering. Direction comes from the transmission, but
+    // heading only changes while rolling, not from steering input alone.
+    const signedSpeed = this.speed * dir;
+    if (Math.abs(signedSpeed) > 4) {
+      const steerAngle = this.dc.steer * MAX_STEER_ANGLE;
+      this.vehicle.rotation += (signedSpeed / WHEELBASE) * Math.tan(steerAngle) * dt;
+    }
 
     // Move (forward vector = up at rotation 0).
     const fx = Math.sin(this.vehicle.rotation);

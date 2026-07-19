@@ -53,6 +53,8 @@ localStorage.
   reverse, inspect, and identify gauges.
 - Keep text concise enough for mobile cards, and add every display string through
   `js/i18n/en.js` and `js/i18n/he.js`.
+- Top-down driving should feel like a vehicle, not a rotateable sprite: steering
+  changes heading only while the vehicle is moving, using a front-wheel bicycle model.
 
 ## Core Controls
 
@@ -61,6 +63,16 @@ localStorage.
 - Gear selectors must match the cockpit photo: transfer case on the left, transmission
   on the right.
 - Fullscreen must only be triggered from pointer gestures.
+
+## Driving Physics Guidelines
+
+- Use signed speed and a front-wheel steering angle for top-down yaw:
+  `yawRate = signedSpeed / wheelbase * tan(steerAngle)`.
+- At zero speed, steering wheel input can animate controls but must not rotate the
+  vehicle body.
+- Reverse should naturally invert path curvature by using negative signed speed.
+- Four-wheel-drive and differential behavior should be represented through traction,
+  range, and terrain tuning, not by allowing arcade-style pivot turns.
 
 ## Asset Guidelines
 

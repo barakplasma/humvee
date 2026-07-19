@@ -66,10 +66,12 @@ Each stage ends by starting `StageCompleteScene` with `{ stage, score, nextScene
    → release brake → D).
 2. **City Driving** (`Stage2Scene`) — top-down. Obey a traffic light + stop sign,
    stay on the road (L-shaped course), reach the destination. Manual kinematics
-   (no arcade bodies): heading + signed speed; forward vector `(sinθ, -cosθ)`.
+   (no arcade bodies): heading + speed; forward vector `(sinθ, -cosθ)`. Uses a
+   kinematic bicycle yaw model so the vehicle cannot pivot in place.
 3. **Off-Road & Gears** (`Stage3Scene`) — top-down trail with gear **gates** that
    only open when the correct transfer case + transmission are selected
    (reverse→R, slippery→HL, climb→L+1, cruise→H+D/OD). Teaches terrain→gear mapping.
+   Uses signed-speed bicycle yaw so reverse steering emerges from motion direction.
 4. **Technical Off-Road** (`Stage4Scene`) — **side view** with a terrain heightmap
    and pitch/roll indicators. Steep climb (needs low range + momentum), descent
    (engine braking), side-slope rollover meter, 3-wheel/traction-loss, water
@@ -111,6 +113,16 @@ Steering input priority each frame: **keyboard > wheel drag > device tilt > cent
 When embedding in a scrolling scene, set `dc.container.setScrollFactor(0)` so the
 HUD/wheel/pedals stay pinned (they're built in screen space). `Dialog` outputs are
 already `scrollFactor(0)`.
+
+## Top-down vehicle physics
+
+For Stages 2–3, steering must not directly rotate the sprite. Model steering as a
+front-wheel angle in a simple kinematic bicycle equation:
+`yawRate = signedSpeed / wheelbase * tan(steerAngle)`. At zero speed, yaw is zero.
+This is intentionally more accurate than an arcade pivot: gas/brake change speed,
+speed plus front-wheel steering changes heading, and reverse uses negative signed
+speed. Do not reintroduce low-speed steering floors that let the vehicle spin while
+stationary.
 
 ### Recommended Phaser skills
 Before Phaser engine, scene lifecycle, or input work, install and use the relevant

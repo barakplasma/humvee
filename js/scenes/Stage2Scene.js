@@ -7,6 +7,8 @@ import { addFullscreenButton } from "../ui/fullscreen.js";
 
 const WORLD_W = 2000;
 const WORLD_H = 1500;
+const WHEELBASE = 115;
+const MAX_STEER_ANGLE = 0.48;
 
 // Road segments (axis-aligned rectangles) forming an "L": up, then right.
 const ROADS = [
@@ -152,9 +154,12 @@ export default class Stage2Scene extends Phaser.Scene {
     }
     this.speed = Phaser.Math.Clamp(this.speed, 0, onRoad ? MAX : 140);
 
-    // Steering (more effective with speed, but usable when crawling).
-    const steerFactor = 0.4 + 0.6 * Phaser.Math.Clamp(this.speed / 200, 0, 1);
-    this.vehicle.rotation += this.dc.steer * 2.4 * steerFactor * dt;
+    // Kinematic bicycle steering: only the front wheels steer, and the body only
+    // yaws when the vehicle is moving. This prevents pivoting in place.
+    if (this.speed > 4) {
+      const steerAngle = this.dc.steer * MAX_STEER_ANGLE;
+      this.vehicle.rotation += (this.speed / WHEELBASE) * Math.tan(steerAngle) * dt;
+    }
 
     // Move along heading (texture points up → forward = (sin, -cos)).
     const fx = Math.sin(this.vehicle.rotation);
