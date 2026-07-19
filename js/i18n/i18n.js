@@ -8,7 +8,7 @@ export const LOCALES = {
 };
 
 const STORAGE_KEY = "humvee.locale";
-const DEFAULT_LOCALE = "en";
+const DEFAULT_LOCALE = "he";
 
 let current = DEFAULT_LOCALE;
 
