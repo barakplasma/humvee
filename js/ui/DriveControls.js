@@ -33,8 +33,8 @@ export default class DriveControls {
     this._rawTilt = 0;
     this._tiltPermissionHandler = null;
 
-    // Gamepad steering state. Phaser exposes the same leftStick/buttons API in
-    // Phaser 3.87 and Phaser 4, matching the Labs gamepad debug sample.
+    // Gamepad steering state. Phaser exposes the same leftStick/buttons API
+    // as the Labs gamepad debug sample.
     this._gamepad = null;
     this._gamepadConnectedHandler = null;
     this._gamepadDisconnectedHandler = null;

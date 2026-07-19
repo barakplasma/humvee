@@ -2,7 +2,7 @@
 
 A simple, mobile-first educational game (built for **Android Chrome**, works on any modern
 browser) that teaches how to operate a **US military HMMWV "Humvee" A2**. Built with
-[Phaser 3](https://phaser.io/) — no build step, just static files.
+[Phaser 4](https://phaser.io/) — no build step, just static files.
 
 > ⚠️ **Training aid, not an operator's manual.** This game is a simplified educational
 > simulation. It is **not** an authoritative source. The real reference is the operator's
@@ -101,7 +101,7 @@ seamless tiling); the title and cockpit ship as AI images.
 
 ## Tech notes
 
-- Vanilla ES modules; Phaser 3.87.0 vendored locally at `js/vendor/phaser.min.js`
+- Vanilla ES modules; Phaser 4.2.1 vendored locally at `js/vendor/phaser.min.js`
   (no CDN, fully self-contained and offline-capable).
 - Progress and language are saved in `localStorage`.
 - `Phaser.Scale.FIT` keeps a 1280×720 design landscape and scales to the device; a
