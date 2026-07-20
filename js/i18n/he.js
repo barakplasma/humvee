@@ -8,6 +8,7 @@ export const he = {
     disclaimer: "כלי הדרכה בלבד — סימולציה מפושטת, לא מדריך רשמי (ראו TM 9-2320-280-10). פעלו תמיד לפי הדרכה ופיקוח אמיתיים.",
     btn_start: "התחלת אימון",
     btn_back: "חזרה",
+    btn_prev: "קודם",
     btn_next: "הבא",
     btn_continue: "המשך",
     btn_retry: "נסו שוב",
@@ -27,6 +28,7 @@ export const he = {
     about_continue: "המשך במסך מלא",
     // ---- Menu / stage select ----
     menu_select: "בחרו שלב",
+    menu_page: "עמוד {n} / {total}",
     stage: "שלב {n}",
     stage1_title: "בקרות הנהג",
     stage1_blurb: "למדו כל בקרה, ואז התניעו את המנוע.",

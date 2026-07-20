@@ -18,12 +18,14 @@ const STAGES = [
     { n: 9, titleKey: "stage9_title", blurbKey: "stage9_blurb", scene: "Stage7Scene" },
     { n: 10, titleKey: "stage10_title", blurbKey: "stage10_blurb", scene: "Stage8Scene" },
 ];
+const PAGE_SIZE = 4;
 export default class MenuScene extends Phaser.Scene {
     constructor() {
         super("MenuScene");
     }
     create() {
         this.dialog = new Dialog(this);
+        this.page = 0;
         // Background hero (photo / AI / procedural).
         const bg = this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, assetKey("title_art"));
         fitCover(bg, GAME_WIDTH, GAME_HEIGHT);
@@ -49,23 +51,9 @@ export default class MenuScene extends Phaser.Scene {
             .setOrigin(0.5);
         // Language switch (restart scene so everything re-renders in the new direction).
         new LangSwitch(this, 24, 34, () => this.scene.restart());
-        // Stage cards (width scales to the number of stages).
-        const gap = 18;
-        const margin = 28;
-        const n = STAGES.length;
-        const compact = n > 5;
-        const cols = compact ? 4 : n;
-        const cardW = Math.floor((GAME_WIDTH - margin * 2 - gap * (cols - 1)) / cols);
-        const cardH = compact ? 190 : 260;
-        STAGES.forEach((st, i) => {
-            const row = Math.floor(i / cols);
-            const col = i % cols;
-            const rowCount = row === 0 ? cols : n - cols;
-            const rowW = cardW * rowCount + gap * (rowCount - 1);
-            const x = GAME_WIDTH / 2 - rowW / 2 + cardW / 2 + col * (cardW + gap);
-            const y = compact ? 285 + row * 220 : 380;
-            this.makeStageCard(x, y, cardW, st, cardH, compact);
-        });
+        this.cardLayer = this.add.container(0, 0);
+        this.pagerLayer = this.add.container(0, 0);
+        this.renderStagePage();
         // Disclaimer.
         this.add
             .text(GAME_WIDTH / 2, GAME_HEIGHT - 46, t("disclaimer"), {
@@ -105,6 +93,54 @@ export default class MenuScene extends Phaser.Scene {
             this.dialog.toast(t("all_complete_msg"), { color: "#6fbf5a", duration: 3000 });
         }
     }
+    renderStagePage() {
+        this.cardLayer.removeAll(true);
+        this.pagerLayer.removeAll(true);
+        const pages = Math.ceil(STAGES.length / PAGE_SIZE);
+        this.page = Phaser.Math.Clamp(this.page, 0, pages - 1);
+        const start = this.page * PAGE_SIZE;
+        const items = STAGES.slice(start, start + PAGE_SIZE);
+        const cols = 2;
+        const gapX = 34;
+        const gapY = 26;
+        const cardW = 390;
+        const cardH = 158;
+        const rowCount = Math.ceil(items.length / cols);
+        const gridW = cols * cardW + (cols - 1) * gapX;
+        const gridH = rowCount * cardH + (rowCount - 1) * gapY;
+        const top = 212;
+        const left = GAME_WIDTH / 2 - gridW / 2;
+        items.forEach((st, i) => {
+            const row = Math.floor(i / cols);
+            const col = i % cols;
+            const rowItems = row === rowCount - 1 && items.length % cols !== 0 ? items.length % cols : cols;
+            const rowW = rowItems * cardW + (rowItems - 1) * gapX;
+            const rowLeft = GAME_WIDTH / 2 - rowW / 2;
+            const x = (rowItems === cols ? left : rowLeft) + col * (cardW + gapX) + cardW / 2;
+            const y = top + row * (cardH + gapY) + cardH / 2;
+            this.cardLayer.add(this.makeStageCard(x, y, cardW, st, cardH, true));
+        });
+        const pageText = this.add
+            .text(GAME_WIDTH / 2, top + gridH + 42, t("menu_page", { n: this.page + 1, total: pages }), {
+            fontFamily: FONT,
+            fontSize: "18px",
+            color: "#c9b98f",
+            align: "center",
+        })
+            .setOrigin(0.5);
+        this.pagerLayer.add(pageText);
+        if (pages <= 1)
+            return;
+        const prev = this.dialog.makeButton(GAME_WIDTH / 2 - 180, top + gridH + 42, "‹ " + t("btn_prev"), () => {
+            this.page = (this.page + pages - 1) % pages;
+            this.renderStagePage();
+        }, { width: 130, height: 46, fontSize: "18px", color: COLORS.panelLight });
+        const next = this.dialog.makeButton(GAME_WIDTH / 2 + 180, top + gridH + 42, t("btn_next") + " ›", () => {
+            this.page = (this.page + 1) % pages;
+            this.renderStagePage();
+        }, { width: 130, height: 46, fontSize: "18px", color: COLORS.panelLight });
+        this.pagerLayer.add([prev, next]);
+    }
     makeStageCard(x, y, w, st, h = 260, compact = false) {
         const score = getScore(st.n);
         const cont = this.add.container(x, y);
@@ -143,7 +179,7 @@ export default class MenuScene extends Phaser.Scene {
         cont.add(this.add
             .text(0, h / 2 - (compact ? 50 : 62), score ? t("best_score", { score }) : t("no_score"), {
             fontFamily: FONT,
-            fontSize: "17px",
+            fontSize: compact ? "15px" : "17px",
             color: score ? "#d8a54a" : "#9c8f68",
             fontStyle: "bold",
         })
@@ -151,12 +187,13 @@ export default class MenuScene extends Phaser.Scene {
         cont.add(this.add
             .text(0, h / 2 - (compact ? 22 : 28), "▶ " + t("btn_begin"), {
             fontFamily: FONT,
-            fontSize: "22px",
+            fontSize: compact ? "20px" : "22px",
             color: "#6fbf5a",
             fontStyle: "bold",
         })
             .setOrigin(0.5));
         bg.on("pointerup", () => this.scene.start(st.scene));
+        return cont;
     }
 }
 // Scale an image to cover a box (crop overflow), centred.

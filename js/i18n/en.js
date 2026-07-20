@@ -8,6 +8,7 @@ export const en = {
     disclaimer: "Training aid only — a simplified simulation, not an official manual (see TM 9-2320-280-10). Always follow real training and supervision.",
     btn_start: "Start Training",
     btn_back: "Back",
+    btn_prev: "Prev",
     btn_next: "Next",
     btn_continue: "Continue",
     btn_retry: "Retry",
@@ -27,6 +28,7 @@ export const en = {
     about_continue: "Continue fullscreen",
     // ---- Menu / stage select ----
     menu_select: "Select a stage",
+    menu_page: "Page {n} / {total}",
     stage: "Stage {n}",
     stage1_title: "Driver Controls",
     stage1_blurb: "Learn every control, then start the engine.",
