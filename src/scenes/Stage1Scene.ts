@@ -21,10 +21,15 @@ const CLOSEUP_BY_CONTROL = {
   steering: "closeup_steering",
   gauges: "closeup_gauges",
   lights: "closeup_panel",
+  turn: "closeup_turn",
   ignition: "closeup_switch",
+  wipers: "closeup_wipers",
   trans: "closeup_shifters",
   transfer: "closeup_shifters",
-  pbrake: "closeup_shifters",
+  pbrake: "closeup_pbrake",
+  horn: "closeup_horn",
+  brake: "closeup_pedals",
+  accel: "closeup_pedals",
 };
 
 export default class Stage1Scene extends Phaser.Scene {

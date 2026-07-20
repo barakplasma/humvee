@@ -17,6 +17,19 @@ const PIXEL_10_LANDSCAPE = {
   mobile: true,
 };
 
+const STAGE1_CLOSEUPS = [
+  "closeup_gauges",
+  "closeup_panel",
+  "closeup_switch",
+  "closeup_turn",
+  "closeup_wipers",
+  "closeup_steering",
+  "closeup_horn",
+  "closeup_shifters",
+  "closeup_pbrake",
+  "closeup_pedals",
+];
+
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -158,8 +171,9 @@ async function main() {
       `new Promise((resolve, reject) => {
         const start = performance.now();
         const tick = () => {
-          if (window.__HUMVEE_GAME__?.scene) resolve(true);
-          else if (performance.now() - start > 10000) reject(new Error("game did not boot"));
+          const game = window.__HUMVEE_GAME__;
+          if (game?.scene?.isActive?.("AboutScene")) resolve(true);
+          else if (performance.now() - start > 10000) reject(new Error("game did not finish booting"));
           else requestAnimationFrame(tick);
         };
         tick();
@@ -245,13 +259,41 @@ async function main() {
       })`
     );
 
+    const stage1Closeups = await evaluate(
+      page,
+      `(() => {
+        const game = window.__HUMVEE_GAME__;
+        const scene = game.scene.getScene("Stage1Scene");
+        const ids = ${JSON.stringify(STAGE1_CLOSEUPS)};
+        return ids.map((id) => {
+          const texture = scene.textures.get(id);
+          const source = texture?.source?.[0];
+          return {
+            id,
+            exists: scene.textures.exists(id),
+            width: source?.width || 0,
+            height: source?.height || 0,
+          };
+        });
+      })()`
+    );
+
     const failures = report.pages.filter((pageReport) => !pageReport.fits);
-    if (report.documentOverflow.x || report.documentOverflow.y || failures.length || !stage1Dialog.fits) {
-      console.error(JSON.stringify({ menu: report, stage1Dialog }, null, 2));
+    const missingCloseups = stage1Closeups.filter(
+      (item) => !item.exists || item.width < 800 || item.height < 500
+    );
+    if (
+      report.documentOverflow.x ||
+      report.documentOverflow.y ||
+      failures.length ||
+      !stage1Dialog.fits ||
+      missingCloseups.length
+    ) {
+      console.error(JSON.stringify({ menu: report, stage1Dialog, stage1Closeups }, null, 2));
       throw new Error("Pixel 10 layout regression");
     }
 
-    console.log(JSON.stringify({ menu: report, stage1Dialog }, null, 2));
+    console.log(JSON.stringify({ menu: report, stage1Dialog, stage1Closeups }, null, 2));
     page.close();
     browser.close();
   } finally {
