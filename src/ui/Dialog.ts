@@ -51,18 +51,27 @@ export default class Dialog {
     cont.add(titleText);
     fitText(titleText, cw - 60, 76, 24);
 
+    const panelLeft = cx - cw / 2;
+    const panelRight = cx + cw / 2;
+    const panelPad = 52;
     let bodyX = cx;
     let bodyY = titleText.y + titleText.height + 24;
     let bodyWidth = cw - 80;
     if (hasImage) {
-      const photo = s.add.image(cx - 220, cy + 10, imageKey);
+      const imageMaxW = 360;
+      const gap = 44;
+      const imageLeft = panelLeft + panelPad;
+      const imageX = imageLeft + imageMaxW / 2;
+      const textLeft = imageLeft + imageMaxW + gap;
+      const textRight = panelRight - panelPad;
+      const photo = s.add.image(imageX, cy + 10, imageKey);
       const maxW = 360;
       const maxH = hasChoices ? 210 : 250;
       photo.setScale(Math.min(maxW / photo.width, maxH / photo.height));
       cont.add(photo);
-      bodyX = cx + 190;
+      bodyX = textLeft;
       bodyY = cy - 170;
-      bodyWidth = 380;
+      bodyWidth = Math.max(220, textRight - textLeft);
     }
 
     const bodyText = s.add

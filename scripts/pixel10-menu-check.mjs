@@ -32,6 +32,17 @@ function spawnLogged(cmd, args, options = {}) {
   return child;
 }
 
+function waitForExit(child, timeoutMs = 3_000) {
+  if (child.exitCode !== null || child.signalCode !== null) return Promise.resolve();
+  return new Promise((resolve) => {
+    const timer = setTimeout(resolve, timeoutMs);
+    child.once("exit", () => {
+      clearTimeout(timer);
+      resolve();
+    });
+  });
+}
+
 async function waitForHttp(url, timeoutMs = 10_000) {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
@@ -199,19 +210,55 @@ async function main() {
       })`
     );
 
+    const stage1Dialog = await evaluate(
+      page,
+      `new Promise((resolve, reject) => {
+        const game = window.__HUMVEE_GAME__;
+        const start = performance.now();
+        game.scene.start("Stage1Scene");
+        const tick = () => {
+          const scene = game.scene.getScene("Stage1Scene");
+          if (scene?.dialog) {
+            const dialog = scene.dialog.showCard({
+              title: "Transmission Selector",
+              body: "4-speed automatic: P (park), R (reverse), N (neutral), OD (overdrive, road cruising), D (drive), 2 and 1 (low gears for grades and control). For this HMMWV start-up drill, set N before starting.",
+              imageKey: "closeup_shifters",
+            });
+            const panel = dialog.list.find((obj) => obj.type === "Rectangle" && obj.width === 860 && obj.height === 520);
+            const texts = dialog.list.filter((obj) => obj.type === "Text");
+            const body = texts.reduce((longest, obj) => (obj.text.length > longest.text.length ? obj : longest), texts[0]);
+            const panelBounds = panel.getBounds();
+            const bodyBounds = body.getBounds();
+            resolve({
+              panel: { left: panelBounds.left, right: panelBounds.right, top: panelBounds.top, bottom: panelBounds.bottom },
+              body: { left: bodyBounds.left, right: bodyBounds.right, top: bodyBounds.top, bottom: bodyBounds.bottom },
+              bodyStyle: { fontSize: body.style.fontSize, wordWrapWidth: body.style.wordWrapWidth },
+              fits: bodyBounds.left >= panelBounds.left + 40 && bodyBounds.right <= panelBounds.right - 40 && bodyBounds.bottom <= panelBounds.bottom - 96,
+            });
+          } else if (performance.now() - start > 10000) {
+            reject(new Error("Stage1Scene did not start"));
+          } else {
+            requestAnimationFrame(tick);
+          }
+        };
+        tick();
+      })`
+    );
+
     const failures = report.pages.filter((pageReport) => !pageReport.fits);
-    if (report.documentOverflow.x || report.documentOverflow.y || failures.length) {
-      console.error(JSON.stringify(report, null, 2));
-      throw new Error("Pixel 10 menu layout regression");
+    if (report.documentOverflow.x || report.documentOverflow.y || failures.length || !stage1Dialog.fits) {
+      console.error(JSON.stringify({ menu: report, stage1Dialog }, null, 2));
+      throw new Error("Pixel 10 layout regression");
     }
 
-    console.log(JSON.stringify(report, null, 2));
+    console.log(JSON.stringify({ menu: report, stage1Dialog }, null, 2));
     page.close();
     browser.close();
   } finally {
     server.kill("SIGTERM");
     if (chrome) chrome.kill("SIGTERM");
-    await rm(userDataDir, { recursive: true, force: true });
+    await Promise.all([waitForExit(server), chrome ? waitForExit(chrome) : Promise.resolve()]);
+    await rm(userDataDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
   }
 }
 

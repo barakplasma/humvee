@@ -36,6 +36,23 @@ Use it after menu/layout changes and whenever a screenshot shows mobile clipping
 
 ## CDP Setup Pattern
 
+If the Chrome DevTools MCP server is available, prefer it for interactive debugging,
+screenshots, console inspection, network inspection, and performance traces:
+`https://github.com/ChromeDevTools/chrome-devtools-mcp`.
+
+Useful setup references from that project:
+- Standard MCP server command: `npx -y chrome-devtools-mcp@latest`
+- Codex CLI install form: `codex mcp add chrome-devtools -- npx chrome-devtools-mcp@latest`
+- Slim/headless basic-browser mode: `npx -y chrome-devtools-mcp@latest --slim --headless`
+
+The project describes Chrome DevTools MCP as an MCP server that lets coding agents
+control and inspect a live Chrome browser, including screenshots, console messages,
+network requests, automation, and performance traces. It officially supports Google
+Chrome and Chrome for Testing; other Chromium browsers may work but are not guaranteed.
+
+If MCP tools are not exposed in the current session, fall back to the repo's direct
+CDP script pattern below.
+
 For custom checks, follow the same sequence as `scripts/pixel10-menu-check.mjs`:
 
 1. Start a local HTTP server from repo root. ES modules need `http://`, not `file://`.
@@ -73,6 +90,7 @@ Expected behavior:
 - No document x/y overflow.
 - Menu cards fit within 1280x720 scene bounds on every page.
 - Footer/disclaimer does not overlap cards or pager controls.
+- Stage 1 image teaching-card body text stays inside the popup panel.
 
 ## Interactive Browser Check
 
