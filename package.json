@@ -7,6 +7,7 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "typecheck:ts7": "tsgo --noEmit -p tsconfig.json",
+    "test:pixel10-menu": "node scripts/pixel10-menu-check.mjs",
     "check": "npm run typecheck && npm run typecheck:ts7"
   },
   "devDependencies": {

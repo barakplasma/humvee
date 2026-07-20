@@ -213,6 +213,13 @@ Target device: Pixel 10, landscape. We keep 1280×720 `FIT` (letterboxes slightl
 are hardcoded to 1280×720, and Stage 1 hotspots are additionally tuned to the cockpit
 photo's cover-fit. Touch targets are large (pedals 120×180, wheel r≈100).
 
+For browser regression testing, read `skills/test-phaser-game/SKILL.md`. The main
+automated Pixel 10 check is:
+
+```bash
+npm run test:pixel10-menu
+```
+
 ## Internationalization
 - All user-facing copy lives in `src/i18n/en.ts` / `he.ts` keyed by id. **Never
   hardcode display strings in scenes** — add a key and use `t("key")`. `controls.js`

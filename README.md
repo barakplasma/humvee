@@ -85,7 +85,12 @@ iteration, following the incremental approach described by the VS Code team.
 npm install
 npm run build
 npm run check
+npm run test:pixel10-menu
 ```
+
+`npm run test:pixel10-menu` recreates the Pixel 10 landscape menu regression check
+from the captured mobile screenshot: `980x497` CSS pixels, DPR `2.5`, mobile touch
+emulation, and all stage-select pages measured inside the 1280×720 Phaser scene.
 
 ## Run locally
 
